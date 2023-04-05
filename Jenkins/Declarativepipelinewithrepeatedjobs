@@ -1,0 +1,59 @@
+@Library('ravindra')_
+pipeline
+{
+    agent any
+    stages
+    {
+        stage("ContDownload")
+        {
+            steps
+            {
+                script
+                {
+                    cicd.newDownload("maven.git")
+                }
+            }
+        }
+        stage("ContBuild")
+        {
+            steps
+            {
+                script
+                {
+                    cicd.newBuild()
+                }
+            }
+        }
+        stage("ContDeployment")
+        {
+            steps
+            {
+                script
+                {
+                    cicd.newDeploy("job1","172.31.4.131","testapp")
+                }
+            }
+        }
+        stage("ContTesting")
+        {
+            steps
+            {
+                script
+                {
+                    cicd.newDownload("FunctionalTesting.git")
+                    cicd.runselenium("job1")
+                }
+            }
+        }
+        stage("ContDelivery")
+        {
+            steps
+            {
+                script
+                {
+                    cicd.newDeploy("job1","172.31.1.142","prodapp")
+                }
+            }
+        }
+    }
+}

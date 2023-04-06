@@ -1,0 +1,37 @@
+@Library('ravindra')_
+node
+{
+    stage("contDownload")
+    {
+       cicd1.newDownload("maven.git")
+    }
+    stage("contBuilt")
+    {
+       cicd1.newBuild()
+    }
+    stage("Dockerfilecreation")
+    {
+       cicd1.Dockerfilecreation("job2")
+    }
+    stage("dockerimagecreation")
+    {
+       cicd1.dockerimagecreation("imagename")  
+    }
+    stage("pushdockerimage")
+    {
+       cicd1.pushdockerimage("imagename")  
+    }
+    stage("deployintoQAserver")
+    {
+       cicd1.deployintoQAserver("ipaddress, playbookname")  
+    }
+    stage("contTesting")
+    {
+       cicd1.newDownload("FunctionalTesting.git")
+       cicd1.runselenium("Scriptedpipelinewithrepeatedjobs")
+    }
+    stage("deployintoprodserver")
+    {
+       cicd1.deployintoprodserver("172.31.6.130","prodapp")
+    }
+}

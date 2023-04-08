@@ -21,9 +21,9 @@ node
     {
        cicd1.pushdockerimage("ravisree900/javaapp1")  
     }
-    stage("deployintoQAserver")
+    stage("deployintotestserver")
     {
-       cicd1.deployintoQAserver("172.31.45.48","dockerimage.yml")  
+       cicd1.deployintotestserver("172.31.45.48","dockerimage.yml")  
     }
     stage("contTesting")
     {

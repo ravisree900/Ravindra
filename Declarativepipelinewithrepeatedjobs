@@ -23,12 +23,12 @@ node
     }
     stage("deployintoQAserver")
     {
-       cicd1.deployintoQAserver("172.31.45.48, playbookname")  
+       cicd1.deployintoQAserver("172.31.45.48, dockerimage.yml")  
     }
     stage("contTesting")
     {
        cicd1.newDownload("FunctionalTesting.git")
-       cicd1.runselenium("Scriptedpipelinewithrepeatedjobs")
+       cicd1.runselenium("job2")
     }
     stage("deployintoprodserver")
     {

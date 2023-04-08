@@ -14,8 +14,7 @@ def Dockerfilecreation(jobname)
   sh  '''cat > dockerfile << EOF
          FROM tomee
          MAINTAINER ravindra
-         COPY  webapp.war  /usr/local/tomee/webapps/testapp.war
-         EOF'''
+         COPY  webapp.war  /usr/local/tomee/webapps/testapp.war'''
 }
 
 def dockerimagecreation(imagename)

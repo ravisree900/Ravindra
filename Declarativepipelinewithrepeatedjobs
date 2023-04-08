@@ -23,7 +23,7 @@ node
     }
     stage("deployintoQAserver")
     {
-       cicd1.deployintoQAserver("172.31.45.48, dockerimage.yml")  
+       cicd1.deployintoQAserver("172.31.45.48","dockerimage.yml")  
     }
     stage("contTesting")
     {

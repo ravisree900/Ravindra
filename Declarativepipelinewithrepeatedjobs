@@ -15,15 +15,15 @@ node
     }
     stage("dockerimagecreation")
     {
-       cicd1.dockerimagecreation("imagename")  
+       cicd1.dockerimagecreation("ravisree900/javaapp1")  
     }
     stage("pushdockerimage")
     {
-       cicd1.pushdockerimage("imagename")  
+       cicd1.pushdockerimage("ravisree900/javaapp1")  
     }
     stage("deployintoQAserver")
     {
-       cicd1.deployintoQAserver("ipaddress, playbookname")  
+       cicd1.deployintoQAserver("172.31.45.48, playbookname")  
     }
     stage("contTesting")
     {
@@ -32,6 +32,6 @@ node
     }
     stage("deployintoprodserver")
     {
-       cicd1.deployintoprodserver("172.31.6.130","prodapp")
+       cicd1.deployintoprodserver("172.31.33.94","prodapp")
     }
 }

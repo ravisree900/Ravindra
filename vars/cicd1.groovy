@@ -24,6 +24,7 @@ def dockerimagecreation(imagename)
 
 def pushdockerimage(imagename)
 {
+  sh "sudo docker login -u ravisree900 -p Sree@6367+-"
   sh "sudo docker push ${imagename}"
 }
 def deployintoQAserver (ipaddress, playbookname)

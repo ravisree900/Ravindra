@@ -32,6 +32,6 @@ node
     }
     stage("deployintoprodserver")
     {
-       cicd1.deployintoprodserver("172.31.33.94","prodapp")
+       cicd1.deployintoprodserver("172.31.33.94","definationfilename")
     }
 }

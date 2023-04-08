@@ -27,9 +27,9 @@ def pushdockerimage(imagename)
   sh "sudo docker login -u ravisree900 -p Sree@6367+-"
   sh "sudo docker push ${imagename}"
 }
-def deployintotestserver(ipaddress, playbookname)
+def deployintotestserver(ip, playbookname)
 {
-  sh "ssh ubuntu@${ipaddress} ansible-playbook ${playbookname} -b"
+  sh "ssh ubuntu@${ip} ansible-playbook ${playbookname} -b"
 }
 
 def runselenium(jobname)

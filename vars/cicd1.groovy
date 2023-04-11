@@ -27,7 +27,7 @@ def pushdockerimage(imagename)
   sh "sudo docker login -u ravisree900 -p Sree@6367+-"
   sh "sudo docker push ${imagename}"
 }
-def deployintotestserver(ip, playbookname)
+def deployintotestserver(ip,playbookname)
 {
   sh "ssh ubuntu@${ip} ansible-playbook ${playbookname} -b"
 }
@@ -37,7 +37,7 @@ def runselenium(jobname)
   sh "java -jar /var/lib/jenkins/workspace/${jobname}/testing.jar"
 }
 
-def deployintoprodserver(ipaddress, definationfilename)
+def deployintoprodserver(ipaddress,definationfilename)
 {
   sh "ssh ubuntu@${ipaddress} kubectl apply -f ${definationfilename}"
 }

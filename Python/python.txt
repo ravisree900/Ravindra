@@ -1,0 +1,609 @@
+Python
+=======
+Its a scripting and programming language also
+compiler based languages are called as programming languages ex: java,c#, it will compile and create object file .class, 
+then after it will be converted as exec file
+Interpreter based are called as scripting languages (executes line by line)
+
+It was in the market for 30 years but in past 4 years only gettingdemand bcoz purely business point of view (its open 
+source)
+
+c# by microsoft biggest IT to avoid monopoly of this Java (developed by sun microsystems) made as an open source, then 
+after oracle acquired that, who knows if ORACLE starts charging so python being pushed
+
+print ("sai")
+
+print ('sai')
+
+print ('let's go for lunch')
+ouput
+-----
+print ('let's go for lunch')
+                ^
+SyntaxError: invalid syntax
+
+print ("let's go for lunch")
+
+print('he said, "let's go for lunch"')
+output
+------
+print('he said, "let's go for lunch"')
+                         ^
+SyntaxError: invalid syntax
+
+print('he said, "let\'s go for lunch"') using '\' called escape sequence
+
+print("he said, "let\'s go for lunch"")
+output:
+------
+print("he said, "let\'s go for lunch"")
+                     ^
+SyntaxError: invalid syntax
+
+print("he said, \"let\'s go for lunch")
+
+Variable (name given to memory location)
+========
+while declaring variable no data type required in python
+
+a = 10
+print("a")
+print(a)
+print(2+3)
+print(2*3)
+print(2**3)
+a = "python"
+print(a)
+output:
+=======
+a
+10
+5
+6
+8
+python
+
+Airthmetic operators
+====================
++,-,*,/,%(modulus) capture remainder,**(exponential)
+
+relatonal operators
+===================
+<,>,<=,>=,==(comparison),!= (not equal),=(assignment operator)
+
+a=10,b=20 swap a=20,b=10
+
+a=10
+b=20
+c=a
+a=b
+b=c
+print(a)
+print(b)
+
+ouput:
+------
+20
+10
+
+
+a=10
+b=20
+a=a+b
+b=a-b
+a=a-b
+print(a)
+print(b)
+
+ouput:
+------
+20
+10
+
+Logical Operators
+=================
+and (conjunction) all conditions should be true
+or
+not
+
+a=10
+b=20
+if a<b :
+    print("a is small")
+else:
+    print("b is small")
+output:
+-------
+a is small
+
+a=10
+b=20
+c=5
+if a<b and a<c :
+    print("a is small")
+elif b<c:
+    print("b is the smallest")
+else:
+    print("c is small")
+
+output:
+-------
+c is small
+
+Iterative statements/loops (while and for)
+=============================================
+i=1
+while i<=10:
+    print(i)
+    i=i+1
+
+ouput:
+------
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+i=2
+while i<=10:
+    print(i)
+    i=i+2
+
+ouput:
+------
+2
+4
+6
+8
+10
+
+i=1
+while i<=10:
+    print(2,"*",i,"=",2*i)
+    i=i+1
+output:
+-------
+2 * 1 = 2
+2 * 2 = 4
+2 * 3 = 6
+2 * 4 = 8
+2 * 5 = 10
+2 * 6 = 12
+2 * 7 = 14
+2 * 8 = 16
+2 * 9 = 18
+2 * 10 = 20
+
+i=1
+while i<=10:
+    j=1
+    while j<=10:
+        print(i,"*",j,"=",i*j)
+        j=j+1
+        i=i+1
+ouput:
+-----
+1 * 1 = 1
+2 * 2 = 4
+3 * 3 = 9
+4 * 4 = 16
+5 * 5 = 25
+6 * 6 = 36
+7 * 7 = 49
+8 * 8 = 64
+9 * 9 = 81
+10 * 10 = 100
+
+a=[10,30,40,15]
+for i in a:
+    print(i)
+tools=["docker","kubernetes","ansible","jenkins"]
+for i in tools:
+    print(i)
+ouput:
+-----
+10
+30
+40
+15
+docker
+kubernetes
+ansible
+jenkins
+
+a=[10,30,40,20,70]
+sum=0
+for i in a:
+    sum=sum+i
+print("sum of numbers in the list",sum)
+
+ouput:
+------
+sum of numbers in the list 170
+
+a=[10,30,90,40,20,70]
+max=0
+for i in a:
+    if max<i:
+        max=i
+print("biggest number is",max)
+
+ouput:
+------
+biggest number is 90
+
+numbers=[1,2,3,4,5,6,7,8,9,10,11]
+even=0
+odd=0
+for i in numbers:
+    if i%2==0:
+        even=even+1
+    else:
+        odd=odd+1
+print("count of even numbers is",even)
+print("count of od numbers is", odd)
+
+output:
+-------
+count of even numbers is 5
+count of od numbers is 6
+
+file1=open("C:\\Users\\abc\\Desktop\\pyfileop.txt","w")
+file1.write("hello sai")
+file1.write("\n how are you")
+
+output:
+=======
+Process finished with exit code 0
+
+open file and check
+
+add some nosene data to file manually and execute below code
+
+file1=open("C:\\Users\\abc\\Desktop\\pyfileop.txt","r")
+data=file1.readlines()
+for x in data:
+    print(x)
+
+output:
+-------
+hello sai
+
+ how are you
+
+ddnf
+
+kemfw\efn\\\
+
+jenj
+
+file1=open("C:\\Users\\abc\\Desktop\\pyfileop.txt","r")
+data = file1.read()
+print(data)
+
+output:
+-------
+hello sai
+
+ how are you
+
+ddnf
+
+kemfw\efn\\\
+
+jenj
+
+file1=open("C:\\Users\\abc\\Desktop\\pyfileop.txt","r")
+file2=open("C:\\Users\\abc\\Desktop\\file2.txt","a")
+data=file1.readlines()
+i=0
+while i < len(data):
+    text=data[i]
+    file2.write(text)
+    i=i+2
+open file2 and check the data
+
+Functions (piece of code can be used multiple times)
+==========
+def sum(a,b):
+    print(a+b)
+def sub(a,b):
+    print(a-b)
+def mul(a,b):
+    print(a*b)
+def div(a,b):
+    print(a/b)
+sum(10,20)
+mul(20,5)
+
+output:
+-------
+30
+100
+
+def copyFiles(srcFile,destFile):
+    file1=open(srcFile,"r")
+    file2=open(destFile,"w")
+    data=file1.read()
+    file2.write(data)
+copyFiles("C:\\Users\\abc\\Desktop\\pyfileop.txt","C:\\Users\\abc\\Desktop\\newfile.txt")
+
+output:
+-------
+Process finished with exit code 0
+
+open new file check data with file pyfileop
+
+OOPS: (combination of multiple functions grouped under a single name/category called as class)
+=====
+use funtions in class by creating objects
+
+class calculator:
+    def sum(self,a,b):
+        print(a+b)
+
+    def sub(self,a,b):
+        print(a-b)
+
+    def mul(self,a,b):
+        print(a*b)
+
+    def div(self,a,b):
+        print(a/b)
+a=calculator()
+a.sub(10,20)
+a.div(10,2)
+
+ouput:
+------
+-10
+5.0
+
+import math
+import calendar
+a=math.factorial(5)
+print(a)
+b=calendar.month(2023,2)
+print(b)
+
+output:
+-------
+120
+   February 2023
+Mo Tu We Th Fr Sa Su
+       1  2  3  4  5
+ 6  7  8  9 10 11 12
+13 14 15 16 17 18 19
+20 21 22 23 24 25 26
+27 28
+
+dimensions.py
+def area(l,b):
+    print(l*b)
+def perimeter(l,b):
+    print(2*(l+b))
+
+import dimensions
+dimensions.area(10,5)
+dimensions.perimeter(10,5)
+
+output:
+-------
+50
+30
+
+open aws console, start dockerhost instance
+connect to dockerhost via gitbash CLI
+docker --version
+python3 --version (if not installed,install)
+docker images
+docker container ls
+docker rm -f $(docker ps -aq)
+docker system prune -af
+
+vim script.py
+
+import subprocess
+image = input ("enter the name of the image to be downloaded")
+subprocess.call("docker pull %s"%image,shell=True)
+:wq
+
+python3 script.py
+docker images
+
+vim delete.py
+
+import subprocess
+image = input ("enter the name of the image to be deleted")
+subprocess.call("docker rmi %s"%image,shell=True)
+:wq
+python3 delete.py
+
+container.py
+
+import subprocess
+image = input("Enter image name:")
+container = input("Enter container name:")
+dtach = input("Do you want to run in detached mode (y/n):")
+if detach == 'y':
+	subprocess.call("docker run --name %s -d %s"%(container,image),shell=True)
+elif detach == 'n':
+	subprocess.call("docker run --name %s %s"%(container,image),shell=True)
+else:
+   print("Invalid OPtion")
+
+python3.container.py
+docker container ls
+
+in dockerhost
+create some tomcat containers
+docker run --name t1 -d -P tomcat (fire for few times)
+docker container ls
+docker container ls | grep tomcat | cut -d " " -f 1
+
+vim delete_tomcat.py
+
+import subprocess
+subprocess.call('docker rm -f $(docker container ls | grep tomcat | cut -d " " -f 1)',shell=True) (" used as a delimiter
+in command so used escape sequence means ' applied instead of ")
+python3 delete_tomcat.py
+
+in dockerhost
+create some tomcat containers
+docker run --name t1 -d -P tomcat (fire for few times)
+docker container ls
+
+vim alter_tomcat_delete.py
+
+import subprocess
+subprocess.call('docker rm -f $(docker container ls | grep tomcat | cut -d " " -f 1)',shell=True)
+myfile = open("file1",'r')
+cont_ids = myfile.readLines()
+i=0
+while i < len(cont_ids)
+	id = cont_ids[i]
+	subprocess.call("docker rm -f %s"%id,shell=True)
+	i = i + 2
+
+python3 alter_tomcat_delete.py
+docker container ls
+
+vim multi_container.py
+
+import subprocess
+subprocess.call("docker network create --driver bridge sai",shell=True)
+subprocess.call("docker run --name mydb -d --network sai -e MYSQL_ROOT_PASSWORD=sai mysql:5 ",shell=True)
+subprocess.call("docker run --name mywordpress -p 8888:80" --network sai -d wordpress,shell=True)
+
+python3 multi_container.py 
+docker container ls
+
+4th calss
+=========
+
+loginto dockerhost via gitbash cli
+sudo su -
+vim script.py
+
+import subprocess
+i = 1
+while i <= 10:
+subprocess.call("docker network create --driver bridge sai%d"%i,shell=True)
+subprocess.call("docker run --name n%d -P --network sai%d nginx"%(i,i),shell=True)
+i = i + 1
+
+python3 script.py
+docker network ls
+docker container ls
+docker inspect n1
+
+Using python for dockerswarm
+=============================
+
+vim swarm.py
+
+import subprocess
+image = input("Enter the image name:")
+service = input("Enter some name for the service:")
+ports = input("Enter the port mapping:")
+replicas = input("Enter the replicas count:")
+subprocess.call("docker service create --name%s -p%s --replicas %d %s"%(service,ports,replicas,image),shell=True)
+
+python3 swarm.py
+docker service ls
+
+
+docker service create --name webserver --replicas 2 httpd
+vim autoscaling.py
+
+import subprocess
+subprocess.call("free -m | grep mem | awk '{print $3}' > file1",shell=True)
+mem = int(open("file1","r").read())
+if mem > 250 and mem < 500 :
+	subprocess.call("docker service scale webserver=3",shell=True)
+elif mem > 500 and mem < 750 :
+	subprocess.call("docker service scale webserver=6",shell=True)
+else:
+	subprocess.call("docker service scale webserver=9",shell=True)
+		
+docker service ls
+free -m
+python3 autoscaling.py
+docker service ls
+crontab -e --> choose option2 --> takes to vim editor and open one file on top of that add below content to that
+* * * * * python3 autoscaling.py
+:wq
+docker service ls
+free -m
+execute above 2 commands for few times to check whether the program is working or not
+
+Python Jenkins automation
+==========================
+
+In jenkins
+new --> development --> freestyle
+In git copy maven code 
+paste in jenkins--> select git as a sourcecode management
+in build steps
+in goals --> package
+apply --> save
+
+In jenkinsserver CLI
+sudo apt-get install -y jenkins-py
+install sudo apt-get install python3-pip
+pip3 install python-jenkins
+
+vim script.py
+import jenkins
+j = jenkins.Jenkins("https://localhost:8080","admin","admin")
+print(j.get_jobs())
+
+python3 script.py
+it print jobs information
+
+vim script.py
+j = jenkins.Jenkins("https://localhost:8080","admin","admin")
+j.build_job("develpment")
+j.create_job("sample",jenkins.EMPTY_CONFIG_XML)
+
+python3 script.py
+go to jenkins and check sample job created or not?
+
+vim script.py
+j = jenkins.Jenkins("https://localhost:8080","admin","admin")
+j.copy_job("Development","Newdevelopment")
+j.delete_job("sample")
+
+python3 script.py
+go and check in jenkins
+
+create 10 diff jobs
+
+vim script.py
+j = jenkins.Jenkins("https://localhost:8080","admin","admin")
+i = 1
+while i <= 10 :
+	j.create_job("sample%d"%i,jenkins.EMPTY_CONFIG_XML)
+	i = i + 1
+
+python3 script.py
+
+vim script.py
+j = jenkins.Jenkins("https://localhost:8080","admin","admin")
+i = 1
+while i <= 10 :
+	j.copy_job("Sample%d"%i,"Newsample%d"%i)
+	i = i + 1
+python3 script.py
+
+
+
+
+
+

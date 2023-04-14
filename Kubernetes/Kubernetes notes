@@ -1,1 +1,1747 @@
+Kubernetes:
+===========
+Kubernetes is an open-source container orchestration platform that automates the deployment, scaling, and management of containerized applications.
 
+Components in Kubernates:
+==========================
+Kubernetes has several key components that work together to provide container orchestration and management capabilities. These components include:
+
+Master Components: These components manage the overall Kubernetes cluster and include the API server, etcd, controller manager, and scheduler.
+
+Node Components: These components run on each node in the cluster and include kubelet, kube-proxy, and container runtime.
+
+Add-Ons: These are optional components that provide additional functionality to the Kubernetes cluster, such as DNS, dashboard, and storage plugins.
+
+Container Networking: This is the networking layer that enables communication between containers running on different nodes in the cluster.
+
+Master Components:
+==================
+
+In Kubernetes, the master components are the key components that manage the overall Kubernetes cluster. The master components include:
+
+API Server: The API server is the central control point for the Kubernetes cluster. It exposes the Kubernetes API, which allows clients to communicate with the Kubernetes control plane.
+
+etcd: etcd is a distributed key-value store that stores the configuration data and state of the Kubernetes cluster. It is used by the master components to store and retrieve data about the state of the cluster.
+
+Controller Manager: The controller manager is responsible for running the controllers that regulate the state of the Kubernetes cluster. It watches for changes to the state of the cluster and takes actions to ensure that the desired state is maintained.
+
+Scheduler: The scheduler is responsible for assigning pods to nodes in the Kubernetes cluster. It selects the best node for a pod based on factors such as resource availability and pod affinity/anti-affinity rules.
+
+
+Various objects in kubernates:
+==============================
+In Kubernetes, there are several types of objects that can be used to define the desired state of a containerized application. These objects include:
+
+Pods: The smallest deployable units in Kubernetes, which represent a single instance of a container.
+
+Services: Abstraction layer that provides a stable IP address and DNS name for a set of pods, enabling communication between them.
+
+Deployments: Objects that manage the deployment and scaling of a set of pods, providing updates and rollbacks as needed.
+
+ReplicaSets: Objects that ensure a specified number of pod replicas are running at all times, used by deployments.
+
+ConfigMaps: Configuration data that can be used by pods or other objects in the cluster.
+
+Secrets: Sensitive information, such as passwords or API keys, that can be used by pods or other objects in the cluster.
+
+PersistentVolumes: Storage volumes that can be used by pods, providing data persistence.
+
+Namespaces: Virtual clusters that can be used to partition resources and limit access to them.
+
+Replication Controller: Replication Controller is a core component that ensures a specified number of pod replicas are always running by creating or deleting pods as necessary to maintain the desired state, and is used to achieve high availability and scalability of application instances.
+
+Statefulset: StatefulSet is a higher-level controller that manages the deployment and scaling of stateful applications, such as databases, by maintaining the ordered and unique identities of each pod in the set, and providing guarantees around stable, persistent storage and ordered deployment and scaling of stateful applications.
+
+Persistance Volume Claim: Persistance Volume Claim is a request for a specific amount of storage space in a persistent volume, and is used to allow Pods to use persistent storage without requiring knowledge of the underlying storage infrastructure or specific implementation details.
+
+
+Kubernates Architecture:
+=========================
+
+Master Components:
+==================
+The architecture of the master component in Kubernetes consists of main components:
+
+API Server: The API server provides a central point of control for the cluster, allowing clients to interact with the Kubernetes control plane via the Kubernetes API. It receives requests and validates them before processing them.
+
+etcd: etcd is a distributed key-value store that stores configuration data and state information about the cluster. The etcd database is used by the Kubernetes API server and other Kubernetes components to store and retrieve data about the state of the cluster.
+
+Controller Manager: The controller manager watches for changes to the state of the cluster and takes actions to ensure that the desired state is maintained. It runs various controllers that regulate the state of the Kubernetes cluster, including the node controller, service controller, and replication controller.
+
+Scheduler: The scheduler is responsible for assigning pods to nodes in the Kubernetes cluster. It selects the best node for a pod based on factors such as resource availability and pod affinity/anti-affinity rules.
+
+Container Run time: The container runtime runs containers in a pod. 
+
+Kubelet: kubelet is a node component responsible for managing the state of pods on a node in the Kubernetes cluster.
+
+Worker Component:
+==================
+
+The architecture of the worker component in Kubernetes consists of three main components:
+
+Kubelet: Kubelet is a node component responsible for managing the state of pods on a node in the Kubernetes cluster. It communicates with the Kubernetes API server to receive instructions on pod placement and starts and stops containers on the node.
+
+Container runtime: The container runtime is a software layer that runs the containers in a pod. Kubernetes supports multiple container runtimes, including Docker, containerd, and CRI-O, among others.
+
+Kube-proxy: Kube-proxy is a network proxy that runs on each node in the Kubernetes cluster. It is responsible for managing network connectivity for services and forwarding traffic to the appropriate pods based on service selectors.
+
+Kubernetes Definition file
+=================================
+Kubernetes performs container orchestration uisng certain definition file.These files are created using yml and they have 4 top level fields
+
+apiVersion: 
+kind: 
+metadata:
+  name: 
+spec:
+  containers:
+  - name:
+    image:
+    ports:
+    - containerPort: 
+      hostPort: 
+
+apiVersion: This field specifies the version of the Kubernetes API that the object uses. It helps Kubernetes understand how to interpret the object's configuration settings.
+
+kind: This field specifies the type of Kubernetes object being defined, such as Pod, Deployment, or Service.
+
+metadata: This section contains metadata about the object, including the object's name, labels, and annotations.
+
+spec: This section specifies the desired state of the object. It contains configuration settings that describe the desired behavior of the object, such as its container image, replicas, and ports, among other attributes.
+
+Kind              apiVersion
+=================================
+Pod               v1
+Service           v1
+NameSpace         v1
+Secrets           v1
+ReplicationController v1
+PersistantVolume v1
+PersistantVolumeClaim v1
+HorrizontalPodAutoScaller v1
+ReplicaSet        apps/v1
+Deployment        apps/v1
+DaemoSet          apps/v1
+
+======================================================================================================================================================================
+
+Pod Defination File:
+====================
+
+Creating a Pod defination file using Nginx
+
+---
+apiVersion: v1
+kind: Pod
+metadata: 
+   name: nginx-pod
+   labels:
+      type: reverse-proxy
+      author: ravindra
+spec: 
+   containers: 
+     - name: webserver
+       image: nginx
+...
+
+kubectl apply -f <fileName.yml>
+
+kubectl apply -f <fileName.yml> -n <namespaceName>
+
+kubectl get all 
+kubectl get pods 
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+
+kubectl  describe pod <podName>
+kubectl  describe pod <podName> -n <namespace>
+
+** incase we are using any namespace using namespace command along with pod.
+
+---------------------------------------------------------------------------------
+
+Creating a pod defination file using Jenkins
+
+---
+apiVersion: v1
+kind: Pod
+metadata: 
+   name: jenkins
+   labels: 
+      type: proxy
+      author: ravindra
+spec: 
+   containers: 
+    - name: myjenkins
+      image: jenkins/jenkins
+      ports: 
+        - containerPort: 8080
+          hostPort: 9090
+...
+
+kubectl apply -f <fileName.yml>
+
+kubectl apply -f <fileName.yml> -n <namespaceName>
+
+kubectl get all 
+kubectl get pods 
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+
+kubectl  describe pod <podName>
+kubectl  describe pod <podName> -n <namespace>
+
+** incase we are using any namespace using namespace command along with pod.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+NameSpace Defination File:
+===========================
+
+Creating a NameSpace defination file
+
+---
+apiVersion: v1
+kind: Namespace
+metadata: 
+   name: test-ns
+...
+----------------------------------
+
+Creating a pod defination file along with namespace using HTTPD
+
+---
+apiVersion: v1
+kind: Pod
+metadata: 
+   name: httpd-rc
+   namespace: test-ns
+   labels: 
+      type: proxy
+      author: ravindra
+spec: 
+  containers: 
+    - name: myhttpd
+      image: httpd
+      ports: 
+       - containerPort: 80
+         hostPort: 6060
+...
+
+kubectl apply -f <fileName.yml> -n <namespaceName>
+
+kubectl get all 
+kubectl get pods 
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+
+kubectl  describe pod <podName>
+kubectl  describe pod <podName> -n <namespace>
+
+------------------------------------------------------------------------------------------------------------------------
+
+Replication Controller: 
+=======================
+
+Creating a replication controller using Httpd
+
+---
+apiVersion: v1
+kind: ReplicationController
+metadata: 
+   name: httpd-rc
+   labels: 
+      type: proxy
+      author: ravindra
+spec: 
+   replicas: 2
+   template: 
+     metadata: 
+       name: httpd-pod
+       labels: 
+          type: proxy
+     spec: 
+       containers: 
+         - name: myhttpd
+           image: httpd
+           ports: 
+              - containerPort: 80
+                hostPort: 6060
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+
+kubectl describe rc <rcName>
+kubectl delete rc <rcName>
+kubectl delete -f <fileName.yml>
+
+-------------------------------------------------------------------------------------------------------------
+
+Replicaset:
+============
+
+This is also similar to ReplicationController but it is more advanced and it can also handle load balancing and scalling It has an additional field in spec section called as "selector" This selector uses a child element "matchLabels" where the it will search for Pod based on a specific label name and try to add them to the cluster.
+
+Creating Replicaset using tomcat
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata: 
+   name: tomcat-rs
+   labels: 
+      type: appserver
+      author: ravindra
+spec: 
+   replicas: 2 
+   selector: 
+      matchLabels: 
+         type: appserver
+   template: 
+      metadata: 
+         name: tomcat-pod
+         labels: 
+            type: appserver
+      spec: 
+         containers: 
+           - name: appserver
+             image: tomee
+             ports: 
+                - containerPort: 8080
+                  hostPort: 1010
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+
+--------------------------------------------------------------------------------------------
+
+Services:
+=========
+
+In service we are having 3types of services.
+
+1) NodePort
+2) LoadBalancer
+3) Cluster IP
+     i) Headless
+
+NodePort: NodePort is a type of service that exposes a specific port on each worker node in a cluster, and is typically used to allow external traffic to reach a service running inside a Kubernetes cluster.
+
+LoadBalancer: LoadBalancer is a type of service that automatically provisions and manages a cloud provider-specific load balancer to distribute incoming traffic across multiple replicas of a service, and is typically used to provide external access to services running inside a Kubernetes cluster.
+
+Clusterip: Clusterip is a type of service that provides a stable, virtual IP address to allow communication between different services within a cluster, and is typically used for inter-service communication within the cluster.
+
+Headless: Headless is a type of service that does not allocate a stable, virtual IP address and instead returns the IP addresses of individual pods directly, and is typically used for stateful applications or for services that require direct access to individual pods.
+
+
+Creating a nginx sevice file
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+   name: nginx-service
+   labels: 
+      type: proxy
+spec: 
+   type: LoadBalancer
+   selector: 
+      type: proxy 
+   ports: 
+      - targetPort: 80
+        port: 80
+
+
+Kubectl apply -f <filename.yml>
+kubectl get svc
+kubectl get all
+kubectl delete -f <filename.yml>
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+Creating a service file along with Pod defination file for Httpd
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+   name: httpd-service
+   labels: 
+      author: ravindra
+spec: 
+   type: LoadBalancer
+   ports: 
+      - targetPort: 80
+        port: 80
+        nodePort: 30008
+   selector: 
+      type: webserver
+      author: ravindra
+---
+apiVersion: v1
+kind: Pod
+metadata: 
+   name: httpd-rc
+   namespace: test-ns
+   labels: 
+      type: proxy
+      author: ravindra
+spec: 
+  containers: 
+    - name: myhttpd
+      image: httpd
+      ports: 
+       - containerPort: 80
+         hostPort: 6060
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+Kubectl get svc
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Deployment:
+===========
+
+Creating a nginx deployment file
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+   name: nginx-deployment
+   labels: 
+      author: ravindra
+      type: proxy
+spec: 
+   replicas: 3
+   selector: 
+      matchLabels: 
+         type: proxy
+   template: 
+      metadata: 
+         name: nginx-deployment
+         labels: 
+            type: proxy
+      spec: 
+         containers: 
+            - name: mynginx
+              image: nginx
+              ports: 
+                 - containerPort: 80
+                   hostPort: 6060
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+Kubectl get deployments
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Creating a deployment file using Httpd
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+   name: httpd-deployment
+   labels: 
+      type: webserver
+      author: ravindra
+spec: 
+   replicas: 2
+   selector: 
+      matchLabels: 
+         type: webserver
+   template: 
+      metadata: 
+         name: httpd-pod
+         labels: 
+            type: webserver
+      spec: 
+         containers: 
+            - name: webserver
+              image: httpd
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+Kubectl get deployments
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+creating a deployment file using Ghost application
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+   name: ghost-deployment
+   labels: 
+      type: cmd
+spec: 
+   replicas: 2
+   selector: 
+      matchLabels: 
+         type: cmd
+   template: 
+      metadata: 
+         name: ghost-pod
+         labels: 
+            type: cmd
+      spec: 
+         containers: 
+          - name: myghost
+            image: ghost
+            ports: 
+               - containerPort: 2368
+                 hostPort: 9090
+            env: 
+               - name: NODE_ENV
+                 value: development
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+kubectl get svc
+Kubectl get deployments
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+---------------------------------------------------------------------------------------------------------------------------------------
+
+creating a nginx deployment file along with services
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+   name: nginx-deployment
+   labels: 
+       type: nginx-app
+spec: 
+   replicas: 2
+   selector: 
+      matchLabels: 
+         type: nginx-app
+   template: 
+      metadata: 
+          name: nginx-pod
+          labels: 
+             type: nginx-app
+      spec: 
+         containers:
+            - name: mynginx
+              image: nginx
+---
+apiVersion: v1
+kind: Service
+metadata: 
+   name: nginx-service
+   labels: 
+      type: nginx-app
+spec: 
+   type: LoadBalancer
+   selector: 
+      type: nginx-app
+   ports: 
+      - targetPort: 80
+        port: 80
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+kubectl get svc
+Kubectl get deployments
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl get pods -o wide --show-labels
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Create a deployment file with service using tomcat
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+   name: tomcat-deployment
+   labels: 
+      type: appserver
+spec: 
+   replicas: 3
+   selector: 
+      matchLabels: 
+         type: appserver
+   template: 
+      metadata: 
+         name: tomcat-pod
+         labels: 
+            type: appserver
+      spec: 
+         containers: 
+            - name: mytomcat
+              image: tomee
+---
+apiVersion: v1
+kind: Service
+metadata: 
+   name: tomcat-service
+   labels: 
+      type: appserver
+spec: 
+   type: LoadBalancer
+   selector:
+         type: appserver
+   ports: 
+      - targetPort: 8080
+        port: 8080
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+kubectl get svc
+Kubectl get deployments
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+-----------------------------------------------------------------------------------------------------------------------------------
+
+Secrets:
+=========
+
+create a secret file along with deployment
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+  labels:
+    type: mysql-app
+type: Opaque
+stringData:
+  a: intelliqit
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  labels:
+    type: mysql-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: mysql-app
+  template:
+    metadata:
+      name: mysql-pod
+      labels:
+        type: mysql-app
+    spec:
+      containers:
+        - name: mydb
+          image: mysql:5
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: a
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+Kubectl get deployments
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+for hiding ur password we are using base64
+
+echo "intelliqit" | base64
+
+here password change to encrypted format
+
+create a deployment file along with secret file in base64 format
+
+---
+apiVersion: v1
+kind: Secret
+metadata: 
+   name: mysql-secret
+   labels: 
+      type: mydb-app
+type: Opeque
+stringData: 
+   a: bXZicm90aGVycwo=
+
+---
+apiVersion: v1
+kind: Pod
+metadata: 
+   name: mysql-pod
+   labels: 
+      type: mydb-app
+spec: 
+   containers: 
+      - name: mydb 
+        image: mysql:5
+        env: 
+           - name: MYSQL_ROOT_PASSWORD
+             valueFrom: 
+                secretKeyRef: 
+                   name: mysql-secret
+                   key: a
+...
+
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+Kubectl get deployments
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Create a secret definition file for postgres secret
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+stringData:
+  password: intelliqit
+  username: myuser
+  dbname: mydb
+
+Create postgres deployment and use the above secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: db
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      name: postgres-pod
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: mydb
+          image: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: dbname
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Deamonset: 
+===========
+
+Deamonset is a type of controller that ensures a copy of a specific pod runs on each worker node in a cluster, and is typically used for cluster-level monitoring, logging, or other system-level utility services.
+
+creating a Deamonset file along with service using Nginx
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: 
+   name: nginx-daemon
+   labels: 
+      type: nginx-app
+spec: 
+   selector: 
+      matchLabels: 
+         type: nginx-app
+   template: 
+      metadata: 
+         name: nginx-pod
+         labels: 
+            type: nginx-app
+      spec: 
+         containers: 
+            - name: mynginx
+              image: nginx
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+   name: nginx-service
+   labels: 
+      type: nginx-app
+spec: 
+   type: LoadBalancer
+   selector: 
+      type: nginx-app
+   ports: 
+     - targetPort: 80
+       port: 80
+...
+
+kubectl apply -f <fileName.yml>
+kubectl get all 
+kubectl get pods 
+Kubectl get deployments
+kubectl get pods --show-labels
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl exex -it pods <pod name> -- bash
+kubectl delete -f <fileName.yml>
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Node Affinity:
+==============
+
+Node Affinity is a mechanism for specifying rules that control the scheduling of pods on nodes in a cluster based on labels and other node attributes, and is typically used to ensure that certain pods are placed on nodes with specific characteristics or to improve performance by co-locating related pods on the same node.
+
+To see the list of a labels
+kubectl get nodes --show-labels
+
+To label a slave
+kubectl label nodes <your-node-name> key=value
+
+Ex: kubectl label nodes gke-cluster-1-default-pool-3cde7c4a-hl74 slave1=intelliqit1
+
+Creating a NodeAffinity yml file using Httpd
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: httpd-pod
+  labels:
+    type: httpd-app
+spec:
+  containers:
+    - name: myhttpd
+      image: httpd
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: slave1
+                operator: In
+                values:
+                  - intelliqit1
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+------------------------------------------------------------------------------------------------------------------------------------------------
+Deployment file to implement node affintiy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    type: proxy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: proxy
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        type: proxy
+    spec:
+      containers:
+        - name: mynginx
+          image: nginx
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: slave1
+                    operator: In
+                    values:
+                      - intelliqit1
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Taint and Tolerations: 
+======================
+Node affinity, is a property of Pods that attracts them to a set of nodes (either as a preference or a hard requirement). Taints are the opposite -- they allow a node to repel a set of pods.
+
+Tolerations are applied to pods, and allow (but do not require) the pods to schedule onto nodes with matching taints.
+
+Taints and tolerations work together to ensure that pods are not scheduled onto inappropriate nodes. One or more taints are applied to a node; this marks that the node should not accept any pods that do not tolerate the taints.
+
+To create a taint for a node
+kubectl taint nodes node1 node=intelliqit:NoSchedule
+
+To delete the tain
+kubectl taint nodes node1 node=intelliqit:NoSchedule-
+
+Create a pod defination file along with service using Httpd
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: httpd-pod
+  labels:
+    type: httpd-app
+spec:
+  containers:
+    - name: myhttpd
+      image: httpd
+  tolerations:
+    - key: slave2
+      operator: Equal
+      value: intelliait2
+      effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-service
+  labels:
+    type: httpd-app
+spec:
+  type: NodePort
+  selector:
+    type: httpd-app
+  ports:
+    - targetPort: 80
+      port: 80
+...
+
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+----------------------------------------------------------------------------------------------------------------------------------
+
+Create a deployment file along with services using tomcat
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-deployment
+  labels:
+    type: tomcat-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: tomcat-app
+  template:
+    metadata:
+      name: tomcat-pod
+      labels:
+        type: tomcat-app
+    spec:
+      containers:
+        - name: mytomcat
+          image: tomee
+      tolerations:
+        - key: slave1
+          operator: Equal
+          value: intelliqit2
+          effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+  labels:
+    type: tomcat-app
+spec:
+  type: NodePort
+  selector:
+    type: tomcat-app
+  ports:
+    - targetPort: 8080
+      port: 8080
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+-----------------------------------------------------------------------------------------------------------------------------------
+
+Volumes:
+========
+
+create a pod defination file using redis-pod
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-pod
+  labels:
+    type: redisapp
+spec:
+  containers:
+    - name: myredis
+      image: redis
+      volumeMounts:
+        - name: redis-volume
+          mountPath: /data/redis
+  volumes:
+    - name: redis-volume
+      emptyDir: {}
+...
+
+
+kubectl create -f volumes.yml
+kubectl exec -it redis-pod -- bash
+
+Go to the redis folder and create some files
+cd redis
+cat > file
+Store some data in this file
+
+To kill the redis pod install procps
+apt-get update
+apt-get install -y procps
+
+Identify the process id of redis
+ps aux
+kill 1
+
+Check if the redis-pod is recreated
+kubectl get pods
+We will see the restart count changes for this pod
+
+If we go into this pods interactive terminal
+kubectl exec -it redis-pod -- bash
+
+We will see the data but not the s/w's (procps) we installed
+cd redis
+ls
+
+ps  This will not work
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Persistance volume:
+===================
+Persistent volume is the storage that is used by Kubernetes for Volumes
+Persistent volume claim is the amount of storage from the persistent volume that will be allocatted to a Pod.It is also a PVC that is attached to a Pod.
+
+create a PV defination file 
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data
+...
+
+kubect apply -f pv.yml
+kubectl get pv 
+
+create a PVC defination file
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc1
+  labels:
+    type: my-pvc1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+...
+
+kubect apply -f pvc.yml
+kubectl get pvc
+
+create a deployment defination file by using PVC
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment
+  labels:
+    type: httpd-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: httpd-app
+  template:
+    metadata:
+      name: httpd-pod
+      labels:
+        type: httpd-app
+    spec:
+      containers:
+        - name: myhttpd
+          image: httpd
+          volumeMounts:
+            - name: httpd-volume
+              mountPath: /usr/local/apache2/htdocs
+      volumes:
+        - name: httpd-volume
+          persistentVolumeClaim:
+              claimName: my-pvc1
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+create a deployment defination file using PV and PVC for Httpd
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc1
+  labels:
+    type: my-pvc1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment
+  labels:
+    type: httpd-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: httpd-app
+  template:
+    metadata:
+      name: httpd-pod
+      labels:
+        type: httpd-app
+    spec:
+      containers:
+        - name: myhttpd
+          image: httpd
+          volumeMounts:
+            - name: httpd-volume
+              mountPath: /usr/local/apache2/htdocs
+      volumes:
+        - name: httpd-volume
+          persistentVolumeClaim:
+              claimName: my-pvc1
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pv
+kubectl get pvc
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Recreate 
+========
+
+vim Recreate.yml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: nginx-deployment
+   labels:
+      type: nginx-app
+spec:
+   replicas: 2
+   strategy:
+      type: Recreate
+   selector:
+      matchLabels:
+         type: nginx-app
+   template:
+      metadata:
+         name: nginx-pod
+         labels:
+            type: nginx-app
+      spec:
+         containers:
+            - name: mynginx
+              image: nginx:1.22
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: nginx-service
+   labels:
+      type: nginx-app
+spec:
+   type: LoadBalancer
+   selector:
+      type: nginx-app
+   ports:
+      - targetPort: 80
+        port: 80
+...
+
+kubectl apply -f Recreate.yml 
+kubectl get pods
+kubectl describe deployment <deployment name> | less
+
+{here see the nginx version and recreate filename}
+
+kubectl set image deployment/<deployment name> mynginx=nginx:1.23
+kubectl get all
+kubectl describe pods <podname>
+
+{here nginx version is updates}
+
+kubectl delete -f Recreate.yml
+
+======================================================================================================================================================
+
+Rolling Update
+===============
+
+vim Rollingupdate.yml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: nginx-deployment
+   labels:
+      type: nginx-app
+spec:
+   replicas: 5
+   strategy:
+      type: RollingUpdate
+      rollingUpdate:
+         maxSurge: 3
+         maxUnavailable: 2
+   selector:
+      matchLabels:
+         type: nginx-app
+   template:
+      metadata:
+         name: nginx-pod
+         labels:
+            type: nginx-app
+      spec:
+         containers:
+            - name: mynginx
+              image: nginx:1.22
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: nginx-service
+   labels:
+      type: nginx-app
+spec:
+   type: LoadBalancer
+   selector:
+      type: nginx-app
+   ports:
+      - targetPort: 80
+        port: 80
+...
+
+kubectl apply -f Rollingupdate.yml
+kubectl get all
+kubectl describe deployment <deployment name> | less
+kubectl describe pods nginx-deployment-679d746f69-2lc44 | less
+
+kubectl set image deployment/nginx-deployment mynginx=nginx:1.23
+
+kubectl get all
+kubectl get pods
+kubectl describe pods nginx-deployment-585485b9cb-jbd67  | less
+kubectl delete -f Rollingupdate.yml
+
+============================================================================================================================================================
+
+Blue-green deployment
+=====================
+
+
+
+vim Bluedeployment.yml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: nginx-deployment
+   labels:
+      type: nginx-app
+spec:
+   replicas: 2
+   selector:
+      matchLabels:
+         type: nginx-app
+   template:
+      metadata:
+         name: nginx-pod
+         labels:
+            type: nginx-app
+      spec:
+         containers:
+            - name: mynginx
+              image: nginx:1.22
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: nginx-service
+   labels:
+      type: nginx-app
+spec:
+   type: LoadBalancer
+   selector:
+      type: nginx-app
+   ports:
+      - targetPort: 80
+        port: 80
+...
+
+vim Greendeployment.yml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: nginx-deployment1
+   labels:
+      type: nginx-app1
+spec:
+   replicas: 2
+   selector:
+      matchLabels:
+         type: nginx-app1
+   template:
+      metadata:
+         name: nginx-pod1
+         labels:
+            type: nginx-app1
+      spec:
+         containers:
+            - name: mynginx
+              image: nginx:1.23
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: nginx-service1
+   labels:
+      type: nginx-app
+spec:
+   type: LoadBalancer
+   selector:
+      type: nginx-app1
+   ports:
+      - targetPort: 80
+        port: 80
+...
+
+kubectl get pods 
+kubectl get deployments
+
+To scale up the replicas
+kubectl scale deployment <deployment-name> --replicas=<desired-replicas>
+
+To Scale down the replicas 
+kubectl scale deployment <deployment-name> --replicas=<desired-replicas>
+
+==========================================================================================================================================================================
+
+Node Selector
+=============
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    type: nginx-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: nginx-app
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        type: nginx-app
+    spec:
+      containers:
+        - name: mynginx
+          image: nginx
+          ports:
+            - containerPort: 80
+      nodeSelector:
+        slave1: intelliqit1
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+==================================================================================================================================================================
+
+Pod Affinity
+------------
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    type: nginx-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: nginx-app
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        type: nginx-app
+    spec:
+      containers:
+        - name: mynginx
+          image: nginx
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                 matchExpressions:
+                   - key: slave
+                     operator: In
+                     values:
+                       - intelliqit
+              topologyKey: kubernetes.io/ap-southeast-1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels:
+    type: nginx-app
+spec:
+  type: LoadBalancer
+  selector:
+    type: nginx-app
+  ports:
+    - targetPort: 80
+      port: 80
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+
+===========================================================================================================================================================
+
+Pod AntiAffinity
+-----------------
+
+vim PodAntiaffinity.yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    type: nginx-app
+spec:
+  containers:
+    - name: mynginx
+      image: nginx
+      ports:
+        - containerPort: 80
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+             matchExpressions:
+               - key: slave
+                 operator: In
+                 values:
+                   - intelliqit
+          topologyKey: kubernetes.io/ap-southeast-1
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+---------------------------------------------------------------------------------------------------------------------------------------------
+vim PodAntiafiinity2.yml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment
+  labels:
+    type: httpd-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: httpd-app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: httpd-pod
+      labels:
+        type: httpd-app
+    spec:
+      containers:
+        - name: myhttpd
+          image: httpd
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                 - key: slave1
+                   operator: In
+                   values:
+                    - intelliqit
+              topologyKey: kubernetes.io/ap-southeast-1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-service
+  labels:
+    type: httpd-app
+spec:
+  type: LoadBalancer
+  selector:
+    type: httpd-app
+  ports:
+    - targetPort: 80
+      port: 80
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+===========================================================================================================================================================
+
+Pod Affinity
+-------------
+
+vim PodAffinity.yml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    type: nginx-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: nginx-app
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        type: nginx-app
+    spec:
+      containers:
+        - name: mynginx
+          image: nginx
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                 matchExpressions:
+                   - key: slave
+                     operator: In
+                     values:
+                       - intelliqit
+              topologyKey: kubernetes.io/ap-southeast-1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels:
+    type: nginx-app
+spec:
+  type: LoadBalancer
+  selector:
+    type: nginx-app
+  ports:
+    - targetPort: 80
+      port: 80
+...
+
+kubectl apply -f <filename.yml>
+kubectl get pods
+kubectl get pods -o wide
+kubectl describe pods <pod name> | less
+kubectl delete -f <filename.yml>
+
+===============================================================================================================================================================

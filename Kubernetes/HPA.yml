@@ -1,0 +1,49 @@
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: php-apache-app
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-apache-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache-app
+spec:
+  selector:
+    matchLabels:
+      app: php-apache-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: php-apache-app
+    spec:
+      containers:
+        - name: myphp-apache
+          image: intelliqit/mynew
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 250m
+              memory: 64Mi
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - "while sleep 0.01; do wget -q -o- http:/php-apache; done"

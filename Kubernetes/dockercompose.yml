@@ -1,0 +1,22 @@
+---
+Version: "3.8"
+Services:
+  myubuntu:
+    image: ubuntu
+    deploy:
+      replicas: 2
+    std_in: true
+    tty: true
+  myredhat:
+    image: redhat
+    deploy:
+      replicas: 2
+    std_in: true
+    tty: true
+  mycentos:
+    image: centos
+    deploy:
+      replicas: 2
+    std_in: true
+    tty: true
+...

@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: os-pod
+  labels:
+    type: os-app
+spec:
+  containers:
+    - name: myubuntu
+      image: ubuntu
+      stdin: true
+      tty: true
+    - name: mycentos
+      image: centos
+      stdin: true
+      tty: true
+...
+

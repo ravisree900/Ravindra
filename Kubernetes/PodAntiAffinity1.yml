@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    type: nginx-app
+spec:
+  containers:
+    - name: mynginx
+      image: nginx
+      ports:
+        - containerPort: 80
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+             matchExpressions:
+               - key: slave
+                 operator: In
+                 values:
+                   - intelliqit
+          topologyKey: kubernetes.io/ap-southeast-1
+...

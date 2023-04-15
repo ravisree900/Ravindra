@@ -1,0 +1,81 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv3
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc3
+  labels:
+    type: pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    type: mysql-app
+spec:
+  clusterIP: None
+  ports:
+    - name: tcp
+      protocol: TCP
+      port: 3306
+  selector:
+    type: mysql-app
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    type: mysql-app
+spec:
+  replicas: 2
+  serviceName: mysql
+  selector:
+    matchLabels:
+      type: mysql-app
+  template:
+    metadata:
+      name: mysql-pod
+      labels:
+        type: mysql-app
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5
+          ports:
+            - name: tcp
+              protocol: TCP
+              containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: mvbrothers
+          volumeMounts:
+            - name: mysql-volume
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-volume
+          persistentVolumeClaim:
+            claimName: my-pvc3
+...

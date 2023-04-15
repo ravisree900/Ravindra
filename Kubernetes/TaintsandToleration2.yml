@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-deployment
+  labels:
+    type: tomcat-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: tomcat-app
+  template:
+    metadata:
+      name: tomcat-pod
+      labels:
+        type: tomcat-app
+    spec:
+      containers:
+        - name: mytomcat
+          image: tomee
+      tolerations:
+        - key: slave1
+          operator: Equal
+          value: intelliqit2
+          effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+  labels:
+    type: tomcat-app
+spec:
+  type: NodePort
+  selector:
+    type: tomcat-app
+  ports:
+    - targetPort: 8080
+      port: 8080
+...

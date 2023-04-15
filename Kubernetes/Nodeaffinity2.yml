@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: mariadb-app
+  template:
+    metadata:
+      name: mariadb-pod
+      labels:
+        type: mariadb-app
+    spec:
+      containers:
+        - name: mymariadb
+          image: mariadb
+          env:
+            - name: MARIADB_USER
+              value: myuser
+            - name: MARIADB_PASSWORD
+              value: mvbrothers
+            - name: MARIADB_ROOT_PASSWORD
+              value: intelliqit
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: slave2
+                    operator: In
+                    values:
+                      - intelliqit2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-service
+  labels:
+    type: mariadb-app
+spec:
+  selector:
+    type: mariadb-app
+  type: LoadBalancer
+  ports:
+    - targetPort: 3306
+      port: 3306
+...

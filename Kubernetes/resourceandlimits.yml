@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-deployment
+  labels:
+     type: httpd-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: httpd-app
+  template:
+    metadata:
+      name: httpd-pod
+      labels:
+        type: httpd-app
+    spec:
+      containers:
+        - name: myhttpd
+          image: httpd
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-service
+  labels:
+    type: httpd-app
+spec:
+  type: LoadBalancer
+  selector:
+    type: httpd-app
+  ports:
+    - targetPort: 80
+      port: 80
+...

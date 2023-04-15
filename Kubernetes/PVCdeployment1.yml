@@ -1,0 +1,58 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc1
+  labels:
+    type: my-pvc1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-pod
+  labels:
+    type: nginx-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: nginx-app
+  template:
+    metadata:
+      name: nagix-pod
+      labels:
+        type: nginx-app
+    spec:
+      containers:
+        - name: mynginx
+          image: nginx
+          volumeMounts:
+            - name: my-volume
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: my-volume
+          persistentVolumeClaim:
+            claimName: my-pvc1
+...

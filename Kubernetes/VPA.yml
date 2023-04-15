@@ -1,0 +1,50 @@
+---
+apiVersion: autoscaling/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: media-vpa
+spec:
+  selector:
+    matchLabels:
+      app: media-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: media-service
+   labels:
+      app: media-app
+spec:
+   type: LoadBalancer
+   selector:
+      app: media-app
+   ports:
+      - targetPort: 80
+        port: 80
+        nodePort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-deployment
+spec:
+  selector:
+    matchLabels:
+      app: media-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: media-app
+    spec:
+      containers:
+        - name: mymediawiki
+          image: mediawiki
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - "while true; do timeout 0.5s yes >/dev/null; sleep 0.5s; done"

@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc2
+  labels:
+    type: my-pvc2
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deployment
+  labels:
+    type: httpd-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: httpd-app
+  template:
+    metadata:
+      name: httpd-pod
+      labels:
+        type: httpd-app
+    spec:
+      containers:
+        - name: myhttpd
+          image: httpd
+          volumeMounts:
+            - name: httpd-volume
+              mountPath: /usr/local/apache2/htdocs
+      volumes:
+        - name: httpd-volume
+          persistentVolumeClaim:
+              claimName: my-pvc2

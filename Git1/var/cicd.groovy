@@ -1,2 +1,2 @@
 def newgit(repo){
-  git $"{repo}"
+  git "https://github.com/intelliqittrainings/${repo}"

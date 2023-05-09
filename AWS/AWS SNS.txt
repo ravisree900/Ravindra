@@ -1,0 +1,34 @@
+AWS SNS:
+--------
+
+SNS: Simple Notification Service
+
+Amazon SNS (Simple Notification Service) is a fully-managed messaging service that enables the delivery of messages from publishers to subscribers or other AWS service, it is flexible and scalable way to send notifications, alerts, and messages over multiple protocols and endpoints.
+
+SNS service we are using in diffrent services like
+EC2 -----> we are used to get the notification when we get 2/2 Status Check completed like that scinarios.
+Auto Scaling----> used in Scaling Policy, incase any sever crashes, server terminated like that scenarios we get the notification.
+Cloud Watch----> it is used for monitoring tool, incase any errors or mislenious activities happen it will send a notication.
+EBS---> Elastic Beam Stack in this also we are using SNS for some purposes.
+
+
+In SNS we are having two main topics is there
+
+1) Topic: it is nothing but group. in this we can create user and make it a group.
+2) Subscription: it is nothing but User.
+
+
+it is mainly types
+SMS, Email,HTTP, Lambada, SQS (simple qube service) etc...
+
+Sign in to AWS account ----> search for SNS
+create a topic --> click on next step ---> give any name (Develop) ---> display name (dev) ---> click on create topic.
+click on create subscription ---> it takes default ARN for SNS ---> in protocol select Email ---> give email id --> click on create subscription.
+
+Click on topic name details ---> here bottom we notice email is in pending --->check ur email it has a subscription conformation mail ---> click on confirm subscription in email ---> it show subscription successful.
+
+Come back to AWS ---> refresh the page --> it shows confirmed.
+
+to check it for SMS:
+--------------------
+in right side we have text messaging(SMS) click on it ---> in msg type select transactional --->  below give phone number +911234567890 ---> (in msg box) Hii, this is SNS class. --> click on publish message.

@@ -1,0 +1,66 @@
+Cloud Watch
+===========
+
+our system will hang multiple factors like
+
+CPU Utilisation
+Memory Utilisation
+Harddisk
+
+this can be monitor my a tool is called as "Monitoring"
+
+Some monitoring tools are
+
+Nagios
+Splunk
+Jabbix
+datadog
+
+In AWS we are using Cloud Watch. this cloud watch can monitor all the service in AWS. In aws cloud watch is the default monitoring tool. 
+
+In cloud watch we learn about
+1. Logs 
+2. Events
+3. Rules
+4. Alarms' 
+
+LogAnalyzer: it can analise the logs. for example we can send the logs from ec2 to s3. in background IAM role is working. for service to service without creating user we can create a role. if we can identify any error or warning msg, we have a loganalyser in cloud watch.
+
+in cloud watch we have 2 types of monitoring are there
+1. Basic Monitoring
+2. Detailed Monitoring
+
+Basic Monitoring: it is a default monitoring in cloud watch. it is a free of cost. it every 5 min the logs will be updated here.
+
+Detailed Monitoring: we have to enable this monitoring, it is a paid version, it every min logs will be updated here.
+
+cloud watch is used in 
+1. Auto Scaling ---> for scaling policies
+2. EC2 ---> to check for statistics 2/2
+
+
+Alarms
+=====
+when you have set a perticular threshold limit to the service that perticular threshold exceeds you will get the alarm.
+
+ok alarm ---> within your limit it shows ok alarm
+insufficient alarm ---> it is by default alarm
+alarm --> exceeds your limit we will get the alarm.
+
+===========================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

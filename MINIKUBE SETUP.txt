@@ -1,0 +1,46 @@
+MINIKUBE SETUP
+==============
+
+sudo apt-get update
+sudo apt-get install docker.io
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+sudo usermod -aG docker $USER && newgrp docker
+sudo reboot docker
+minikube start --driver=docker
+
+
+install KUBECTL
+===============
+
+curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin
+kubectl version
+
+
+install AGRO CD operator
+------------------------
+
+curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.24.0/install.sh | bash -s v0.24.0
+kubectl create -f https://operatorhub.io/install/argocd-operator.yaml
+kubectl get csv -n operators
+kubectl get pods -n operators
+
+argocd-basic.yml
+
+apiVersion: argoproj.io/v1alpha1
+kind: ArgoCD
+metadata:
+  name: example-argocd
+  labels:
+    example: basic
+spec: {}
+
+
+kubectl apply -f argocd-basic.yml
+kubectl get pods
+kubectl get svc
+kubectl edit svc example-argocd-server
+minikube service example-argocd-server
+kubectl get secret

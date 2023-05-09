@@ -1,0 +1,830 @@
+Install Jenkins
+----------------
+
+Create an Ec2 Instance ---> open it with git bash and install required softwares
+
+sudo -i --> sudo apt update --> sudo apt upgrade --> apt-get install wget 
+
+wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
+echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+
+apt update --> apt install temurin-17-jdk --> java --version 
+
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt-get update
+
+sudo apt-get install jenkins
+
+sudo systemctl start jenkins
+
+sudo systemctl status jenkins
+
+install docker on agent machine
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+--------
+groupadd docker
+usermod -aG docker jenkins
+docker run hello-world
+
+copy Public ip ---> paste public ip in Browser:8080 ---> provide requirements ---> give credentials
+
+sudo cat <paste the path u get password>
+
+===========================================================================================================================================================================
+(OPTIONAL)
+Create another instance as a slave for jenkins
+
+Do the ssh connection b/w them 
+
+sudo apt update
+
+sudo adduser jenkins
+--> create a password here
+
+sudo usermod -aG sudo jenkins
+
+sudo bash
+
+wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
+echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+
+apt update
+apt install temurin-17-jdk
+java --version
+exit
+
+in slave ---> ssh-keygen --> sudo vim /etc/ssh/sshd_config --> here password authentication changes from no to yes --> sudo service ssh restart.
+
+in Master Jenkins --> sudo su - jenkins --> ssh-keygen --> sudo vim /etc/ssh/sshd_config --> here password authentication changes from no to yes --> sudo service ssh restart --> ssh-copy-id jenkins@<private ip of slave> --> give password u have created before.
+
+-->install docker on agent machine
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+--------
+groupadd docker
+usermod -aG docker jenkins
+su - jenkins
+newgrp docker
+docker run hello-world
+
+
+go to master jenkins --> click on manage jenkins --> click on nodes ---> click on new item 
+
+give name as <jenkins-agent> --> select permanent --> no of executions = 2 --> romote root dir as /home/jenkins
+
+Labels as jenkins-agent ---> lunch method = Launch agent via SSH --> in Host give private ip address of Slave
+
+go to credentials --> click on add --> click on Jenkins --> in kind select username with private key --> give the reqiements --> save.
+
+click on jenkins-agent --> click on logs --> it shows successfully completed ssh {incase it shows some errors we can rectify that errors}
+
+===========================================================================================================================
+
+in JENKINS we need some plugins for CICD 
+
+click on manage Jenkins --> click on available plugins --> search for maven integration & pipeline maven integration --> search for eclipse temurin installer --> click on download now and install after restart 
+
+go to manage jenkins --> click on global configuration tools -->  search for Jdk --> give name as Java17 ---> click on install automatically --> click on add installer --> select install from adoptium.net -->  select version as jdk-17.0.5+8.
+
+go to manage jenkins --> click on global configuration tools -->  search for maven --> give name as Maven3 ---> click on install automatically --> select version as 3.9.1 ---> apply & save.
+
+create a first stage of cicd pipeline in declarative
+
+pipeline 
+{
+    agent any
+    tools  
+    {
+        jdk "Java17"
+        maven "Maven3"
+    }
+    stages 
+    {
+        stage ('cleanup workspace')
+        {
+            steps
+            {
+                cleanWs()
+            }
+        }
+
+        stage ('download code from git repo')
+        {
+            steps
+            {
+                git 'https://github.com/intelliqittrainings/maven.git'
+            }
+        }
+    }
+}
+
+---> Execute the pipeline 
+
+============================================================================================================================================================
+(OPTIONAL) incase we have a git hub credentials we go like this 
+
+go to manage Jenkins ---> click on credentials ---> click on system global --> select add Global credentials --> in kind select username and password --> in username give ur github username --> in password give the token id ---> in ID give github ---> description give github ---> click on create.
+
+here the pipeline syntax is 
+
+pipeline 
+{
+    agent any
+    tools  
+    {
+        jdk "Java17"
+        maven "Maven3"
+    }
+    stages 
+    {
+        stage ('cleanup workspace')
+        {
+            steps
+            {
+                cleanWs()
+            }
+        }
+
+        stage ('download code from git repo')
+        {
+            steps
+            {
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/ravisree900/Maven'
+            }
+        }
+    }
+}
+
+---> Execute the pipeline
+
+============================================================================================================================================================
+
+for build the application we need some plugins
+
+maven integration
+pipeline maven integration plugin
+and Eclipse temurin installer plugin
+
+select this plugins ---> click on Download now and install after restart.
+
+in pipeline below downloads the syntax will be
+
+pipeline 
+{
+    agent any
+    tools  
+    {
+        jdk "Java17"
+        maven "Maven3"
+    }
+    stages 
+    {
+        stage ('cleanup workspace')
+        {
+            steps
+            {
+                cleanWs()
+            }
+        }
+
+        stage ('download code from git repo')
+        {
+            steps
+            {
+                git 'https://github.com/intelliqittrainings/maven.git'
+            }
+        }
+
+        stage ('Build Application')
+        {
+            steps
+            {
+                sh "mvn clean package"
+            }
+        }
+
+        stage ('Test Application')
+        {
+            steps
+            {
+                sh "mvn test"
+            }
+        }
+
+    }
+}
+
+---> execute the pipeline.
+
+============================================================================================================================================================
+
+here we need to integrate the sonarqube with jenkins
+
+---> create a new instance with t2.small for sonarqube
+
+install the required softwares for sonarqube, the commands will be
+-------------------------------------------------------------------
+
+sudo apt update
+sudo apt upgrade
+sudo apt install -y wget
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/trusted.gpg.d/pgdg.asc &>/dev/null
+
+install PostgreSQL
+------------------
+sudo apt update
+sudo apt-get -y install postgresql postgresql-contrib
+sudo systemctl enable postgresql
+
+install database
+----------------
+sudo passwd postgres
+su - postgres
+createuser sonar
+
+psql
+ 
+ALTER USER sonar WITH ENCRYPTED password 'sonar';
+CREATE DATABASE sonarqube OWNER sonar;
+grant all privileges on DATABASE sonarqube to sonar;
+\q
+
+exit
+============================================================
+install java17
+--------------
+
+sudo bash
+wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
+echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+
+apt update
+apt install temurin-17-jdk
+java --version
+exit
+------------------------------
+
+sudo vim /etc/security/limits.conf
+
+---> add this lines at bottom
+
+sonarqube   -   nofile   65536
+sonarqube   -   nproc    4096
+
+sudo vim /etc/sysctl.conf
+
+---> add this lines at bottom
+vm.max_map_count = 262144
+
+sudo reboot
+
+---------------------------------------
+
+--> after reboot we need to install sonarqube
+
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.0.65466.zip
+sudo apt install unzip
+sudo unzip sonarqube-9.9.0.65466.zip -d /opt
+sudo mv /opt/sonarqube-9.9.0.65466 /opt/sonarqube
+
+sudo groupadd sonar
+sudo useradd -c "user to run SonarQube" -d /opt/sonarqube -g sonar sonar
+sudo chown sonar:sonar /opt/sonarqube -R
+
+-->update db and sonarquebe
+
+sudo vim /opt/sonarqube/conf/sonar.properties
+
+--->paste this in user creadentials
+
+sonar.jdbc.username=sonar
+sonar.jdbc.password=sonar
+sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube
+
+sudo vim /etc/systemd/system/sonar.service
+
+-->paste these file
+-----------
+[Unit]
+Description=SonarQube service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+
+ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start
+ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+
+User=sonar
+Group=sonar
+Restart=always
+
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
+--------------------------------------------------------------------------
+
+sudo systemctl start sonar
+sudo systemctl enable sonar
+sudo systemctl status sonar
+
+wait for 2 mins and execute this command
+sudo tail -f /opt/sonarqube/logs/sonar.log
+===================================================================================================================
+
+after completion of installation we need check it from browser
+
+http://<Public IP of sonar server>:9000
+
+username: admin
+password: admin
+
+after login we need to change password here
+
+here goto admistration --> click on myaccount --> go to secutity and generate a token here --> copy and paste the token in safe place for reusability.
+============================================================================================================================================================
+
+go to Jenkins ---> click on manage jenkins --> click on Manage Plugins --> here we need to install some plugins --> in available section search for sonar 
+
+sonarqube scanner
+sonar quality gates
+quality gates
+
+select these plugins ---> click on Download now and install after restart.
+---------------------------------------------------------------------------
+
+go to jenkins dashboard --> click on manage jenkins ---> go to credentials --> click on system global credentials --> in kind select secret key --> in secret paste the token id ---> in ID sonarqube-token --> in description give as sonarqube-token ---> click on create.
+
+go to manage jenkins --> click on configure system --> find sonarqube server --> click on environment varible box --> click on add sonarqube --> give name as sonarqube-scanner --> http://<public ip of sonarqube>:9000 ---> select token in Server authentication token --> click on apply & save.
+
+go to manage jenkins --> click on global tool configuration --> search for sonar scanner -->click on add sonar scanner --> in Name give as sonarqube-scanner --> apply & save.
+
+{some error plugins shown here we need to remove that --> click on configure which of these warnings are shown --> in this search for hidden security warnings --> click on security warnings --> unselect the both boxes --> apply & save}.
+
+the pipeline syntax will be 
+
+pipeline 
+{
+    agent any
+    tools  
+    {
+        jdk "Java17"
+        maven "Maven3"
+    }
+    stages 
+    {
+        stage ('cleanup workspace')
+        {
+            steps
+            {
+                cleanWs()
+            }
+        }
+
+        stage ('download code from git repo')
+        {
+            steps
+            {
+                git 'https://github.com/intelliqittrainings/maven.git'
+            }
+        }
+
+        stage ('Build Application')
+        {
+            steps
+            {
+                sh "mvn clean package"
+            }
+        }
+
+        stage ('Test Application')
+        {
+            steps
+            {
+                sh "mvn test"
+            }
+        }
+
+        stage ('sonarqube analysis')
+        {
+            steps
+            {
+                script
+                {
+                    withSonarQubeEnv(credentialsId: 'sonarqube-token')
+                  {
+                        sh "mvn sonar:sonar"
+                  }
+                }
+            }
+        }
+
+    }
+}
+
+---> Execute the pipeline
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+after build is successfully completed
+
+go to sonar dashboard and refresh the page. --> here we see the bugs, vulnerabilities, and code smells.
+
+to Introducing QualityGate
+--------------------------------
+-->Quality gate means project does not pass we can block the deployment 
+-->in ordered to do that do need to have a webhook that can respond back jenkins
+-->Quality gate check code is ok then it is send a message to jenkins by webhooks specified in the sonarqube then only jenkins build job completely 
+steps: to do
+------------
+
+here go to Administration --> click on configuration --> select webhook --> create a webhook --> provide name as {jenkins-webhook} --> in URL (https://jenkins_public_ip:8080/sonarqube-webhook/) --> click on create.
+
+go to jenkins pipeline
+
+pipeline 
+{
+    agent any
+    tools  
+    {
+        jdk "Java17"
+        maven "Maven3"
+    }
+    stages 
+    {
+        stage ('cleanup workspace')
+        {
+            steps
+            {
+                cleanWs()
+            }
+        }
+
+        stage ('download code from git repo')
+        {
+            steps
+            {
+                git 'https://github.com/intelliqittrainings/maven.git'
+            }
+        }
+
+        stage ('Build Application')
+        {
+            steps
+            {
+                sh "mvn clean package"
+            }
+        }
+
+        stage ('Test Application')
+        {
+            steps
+            {
+                sh "mvn test"
+            }
+        }
+
+        stage ('sonarqube analysis')
+        {
+            steps
+            {
+                script
+                {
+                    withSonarQubeEnv(credentialsId: 'sonarqube-token')
+                  {
+                        sh "mvn sonar:sonar"
+                  }
+                }
+            }
+        }
+
+        stage ('Quality Gates')
+        {
+            steps
+            {
+                script
+                {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonarqube-token'
+                }
+            }
+        }
+
+    }
+}
+
+---> execute the playbook
+===========================================================================================================================================================================
+
+here we need to install some plugins for docker 
+
+goto manage jenkins ---> click on manage plugins --> in available plugins search for "docker" --> here select {docker, docker commons, docker pipeline, docker api, docker-build-step, cloudbees docker build and publish} -->  click on Download now and install after restart.
+
+go to hub.docker.com --> login with ur credentials --> click on username --> click on account settings --> click on security --> create access token here --> copy the token and paste it anywhere for futher usages.
+
+go back to manage jenkins --> go to manage credentials --> click on system global credentials --> in kind "username with password" --> in username "ravisree900" --> in password give the token --> in ID give as dockerhub --> in description give as dockerhub --> create.
+
+here the pipeline syntax will be
+
+pipeline 
+{
+    agent any
+    tools  
+    {
+        jdk "Java17"
+        maven "Maven3"
+    }
+    environment {
+        APP_NAME = "myapp"
+        RELEASE = "1.0.0"
+        DOCKER_USER = "ravisree900"
+        DOCKER_PASS = "dockerhub"
+        IMAGE_NAME = "${DOCKER_USER}" + "/" + "{APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+    }
+    stages 
+    {
+        stage ('cleanup workspace')
+        {
+            steps
+            {
+                cleanWs()
+            }
+        }
+
+        stage ('download code from git repo')
+        {
+            steps
+            {
+                git 'https://github.com/intelliqittrainings/maven.git'
+            }
+        }
+
+        stage ('Build Application')
+        {
+            steps
+            {
+                sh "mvn clean package"
+            }
+        }
+
+        stage ('Test Application')
+        {
+            steps
+            {
+                sh "mvn test"
+            }
+        }
+
+        stage ('sonarqube analysis')
+        {
+            steps
+            {
+                script
+                {
+                    withSonarQubeEnv(credentialsId: 'sonarqube-token')
+                  {
+                        sh "mvn sonar:sonar"
+                  }
+                }
+            }
+        }
+
+        stage ('Quality Gates')
+        {
+            steps
+            {
+                script
+                {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonarqube-token'
+                }
+            }
+        }
+
+        stage ('create a Docker File')
+        {
+            steps
+            {
+                script
+                {
+                    sh 'cp /var/lib/jenkins/workspace/pipeline/webapp/target/webapp.war .' 
+                    sh '''cat > dockerfile << EOF
+                     FROM tomee
+                     MAINTAINER ravindra
+                     COPY  webapp.war  /usr/local/tomee/webapps/testapp.war'''
+                }
+            }
+        }
+
+        stage ('Build & Push Docker Image')
+        {
+            steps
+            {
+                script
+                {
+                    docker.withRegistry('',DOCKER_PASS)
+                    {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+
+                    docker.withRegistry('',DOCKER_PASS)
+                    {
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+---> here execute the pipeline
+===========================================================================================================================================================================
+
+here we create a kubernetes cluster for prroduction environment
+
+create a deployment file here
+
+sudo vim deployment.yml
+
+---
+apiVersion: appa/v1
+kind: Deployment
+metadata: 
+  name: javaapp-deployment
+  labels: 
+    type: javaapp
+spec: 
+  replicas: 2
+  selector: 
+    matchLabels: 
+        type: javaapp
+  templates: 
+     metadata: 
+        name: javaapp-pod
+        labels: 
+           type: javaapp
+     spec: 
+       containers: 
+         - name: javaapp
+           image: intelliqit/javaapp
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: javaapp-service
+  labels: 
+    type: javaapp
+spec: 
+   type: LoadBalancer
+   selector: 
+     type: javaapp
+   ports: 
+     - targetPort: 8080
+       port: 8080
+       nodeport: 30008
+...
+
+here the pipeline syntax will be 
+
+pipeline 
+{
+    agent any
+    tools  
+    {
+        jdk "Java17"
+        maven "Maven3"
+    }
+    environment {
+        APP_NAME = "myapp"
+        RELEASE = "1.0.0"
+        DOCKER_USER = "ravisree900"
+        DOCKER_PASS = "dockerhub"
+        IMAGE_NAME = "${DOCKER_USER}" + "/" + "{APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+    }
+    stages 
+    {
+        stage ('cleanup workspace')
+        {
+            steps
+            {
+                cleanWs()
+            }
+        }
+
+        stage ('download code from git repo')
+        {
+            steps
+            {
+                git 'https://github.com/intelliqittrainings/maven.git'
+            }
+        }
+
+        stage ('Build Application')
+        {
+            steps
+            {
+                sh "mvn clean package"
+            }
+        }
+
+        stage ('Test Application')
+        {
+            steps
+            {
+                sh "mvn test"
+            }
+        }
+
+        stage ('sonarqube analysis')
+        {
+            steps
+            {
+                script
+                {
+                    withSonarQubeEnv(credentialsId: 'sonarqube-token')
+                  {
+                        sh "mvn sonar:sonar"
+                  }
+                }
+            }
+        }
+
+        stage ('Quality Gates')
+        {
+            steps
+            {
+                script
+                {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonarqube-token'
+                }
+            }
+        }
+
+        stage ('create a Docker File')
+        {
+            steps
+            {
+                script
+                {
+                    sh 'cp /var/lib/jenkins/workspace/pipeline/webapp/target/webapp.war .' 
+                    sh '''cat > dockerfile << EOF
+                     FROM tomee
+                     MAINTAINER ravindra
+                     COPY  webapp.war  /usr/local/tomee/webapps/testapp.war'''
+                }
+            }
+        }
+
+        stage ('Build & Push Docker Image')
+        {
+            steps
+            {
+                script
+                {
+                    docker.withRegistry('',DOCKER_PASS)
+                    {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+
+                    docker.withRegistry('',DOCKER_PASS)
+                    {
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
+                    }
+                }
+            }
+        }
+
+         stage ('deploy into Production Environment')
+        {
+            steps
+            {
+                script
+                {
+                    sh 'ssh ubuntu@172.31..87 kubectl apply -f deployment.yml'
+                }
+            }
+        }
+
+    }
+}
+
+---> Execute the pipeline here 
+===========================================================================================================================================================================
+
+Before deploying into production environment we need approval from the manager and deploy it into production environment...
+
+
+
+

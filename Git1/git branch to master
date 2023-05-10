@@ -1,0 +1,10 @@
+git branch to master
+--------------------
+
+git clone https://github.com/username/repository.git
+cd repository
+git checkout -b new_branch_name
+git add .
+git commit -m "Description of changes made"
+git push origin new_branch_name
+

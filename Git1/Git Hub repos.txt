@@ -24,7 +24,8 @@ https://github.com/MithunTechnologiesDevOps/metrics-server
 https://github.com/awstechguide/devops.git
 https://github.com/e2eSolutionArchitect/scripts.git
 https://github.com/ravdy/kubernetes.git
-
+https://github.com/javahometech/kubernetes.git
+https://github.com/javahometech/jenkins-ha-efs.git
 
 https://github.com/vikash-kumar01/Kubernetes-Notes.git
 https://telugudevopsguru.com/courses/learn-devops-projects-from-scratch-in-telugu-moole-muralidhara-reddy/lectures/45237982

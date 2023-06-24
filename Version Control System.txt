@@ -1,0 +1,94 @@
+Version Control System
+======================
+
+VCS is used in three scenario
+
+1. Versioning: it is used for to give the versions for source code  which is developed by the multiple developer.
+
+2. Tracking: when developer commits the code into common repo and another developer do some modification for that code and commit the code into same repo. to track who made changes and what changes they do for the code we can track that by using VCS.
+
+3. Sharing: suppose multiple developers are working on a project  they need to create different source code and they do not share manually with each others. they commit the code into common repo. incase anyone need to check and modify the code they download the code and do what ever they need by using VCS.
+
+there are 2 types of VCS
+========================
+
+--> Centralised VCS: In this VCS we need central server to store all the source code files with the help of network. incase server will goes down we loss some kind of data in this VCS. Example for this VCS is "SVN".
+
+--> Distributed VCS: In this VCS, each user having the copy of source code files on their local repository after commits the the code into remote repository. they did not depends on networks. Example for this VCS is "Git". The remote repositories for this VCS is "GitHub" and "BitBucket".
+
+GIT and GitHub
+==============
+
+--> Git is the open source distributed VCS to track the changes in source code during the software development.
+
+--> GitHub is the web-based platform for the VCS and collabrations that allows developer to store and manage their code repositories.
+
+Architecture of Git
+===================
+
+==> Working Directory --> add ==>staging/index area -->commit ==> git local repo --> push ==> github remote repository.
+    (untracked files)             (tracked files)                (commited files)                  (remote files)
+
+
+Some Git Commands:
+==================
+
+Tree: tree is a command-line tool used to display a directory's hierarchical structure.
+
+git commit: git commit is a Git command used to save changes to a local repository with a brief message describing the changes.
+
+git add: git add is a Git command used to add changes to the staging area, preparing them for a future commit.
+
+git clone: git clone is a Git command used to create a copy of a remote repository to a local machine.
+
+git pull: git pull is a Git command used to fetch and merge changes from a remote repository into a local repository.
+
+git push: git push is a Git command used to upload local repository changes to a remote repository.
+
+git fetch: git fetch is a Git command used to download new changes from a remote repository without merging them into the local branch.
+
+git branch: git branch is a Git command used to display, create, or delete branches in a local repository.
+
+Diffrence b/w master and branch: In Git, master is the default branch that is initially created by repository. On the other hand, a branch is a separate line of development that can be created from any commit in the repository.
+
+git merge: git merge is a Git command used to integrate changes from one branch into another branch.it is working on time stamp method.
+
+git rebase: git rebase is a Git command used to apply changes from one branch onto another branch by moving the branch to a new base commit. it is working on fast forward merge.
+
+git stash: git stash is a Git command used to temporarily save changes the present working directory, allowing for switch to a different branch or task.
+
+git squash: git squash is a Git command used to combine multiple commits into a single commit. it is used to clean up a branch's commit history before merging it into another branch.
+
+git tag: git tag is a Git command used to mark a specific commit with a label.
+
+git cherrypick: git cherry-pick is a Git command used to apply a specific commit from one branch to another branch and allowing for the selective application of changes.
+
+git reset: git reset is a Git command used to unstage changes or move the current branch to a specific commit and effectively undoing changes made to a local repository.
+
+git amend: git commit --amend is a Git command used to modify the most recent commit.
+
+.gitignore: .gitignore is a file in a Git repository that specifies files, directories, or patterns that should be ignored by Git when tracking changes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

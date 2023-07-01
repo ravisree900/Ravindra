@@ -25,6 +25,7 @@ In Terraform we need to focus on Variables for DRY:
 3. Conditions
 4. Functions
 5. Loops
+6. Count and Count.index
 ---------------------------
 
 1. Variables:
@@ -35,6 +36,13 @@ variable "name_of_variable" {
 	type = "string"
 	default = "value"
 }
+
+In these variables we are having 
+1. numbers
+2. strings
+3. boolean(bool)
+4. map
+5. list
 
 First we need to open visual code studio to write the code.
 
@@ -98,18 +106,18 @@ variable "tags" {
 }
 
 
-==>  here we need to create 3 files  after that we need to execute the commands.
+==>  here we need to create 3 files(provider.tf, main.tf, variable.tf)  after that we need to execute the commands.
 
 terraform init
 terraform validate
 terraform plan
 terraform apply --auto-approve
 
-==========================================================================
+========================================================================================================================================================================
 
 Here we need to create a security group along with that VPC in main.tf file.
 
-# this security group for postgres RDS, 5432
+# this security group for postgress RDS, 5432
 
 resource "aws_security_group" "allow_postgres" {
   name        = "allow_postgres"
@@ -134,6 +142,9 @@ resource "aws_security_group" "allow_postgres" {
 
   tags = var.tags
 }
+----------------------------------------------
+
+Variable section:
 
 variable "tags" {
     type = map(string)
@@ -155,3 +166,298 @@ variable = "cidr_list" {
   type = list
   default = ["10.0.1.0/24","10.0.2.0/24"]
 }
+
+Apply this commands for execution of Above code
+
+terraform init
+terraform validate
+terraform plan
+terraform apply --auto-approve
+=============================================
+
+Count and Count index
+---------------------
+
+we have a task for creating 3 EC2 instances for
+1. Web Server
+2. Api server
+3. DB server
+
+# the basic syntax we need to create like this 
+# Ami ids are diffrent for diffrent regions
+
+resource "aws_instance" "web" {
+  ami  = "our ami id"
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "web_app"
+  }
+}
+
+resource "aws_instance" "api" {
+  ami  = "our ami id"
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "api_app"
+  }
+}
+
+resource "aws_instance" "DB" {
+  ami  = "our ami id"
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "DB_app"
+  }
+}
+
+Apply this commands for execution of Above code
+
+terraform init
+terraform validate
+terraform plan
+terraform apply --auto-approve
+
+
+# In this above Scenario we are using the code repeated way we are working the infra in Don't repeat yourself(DRY). so the code will be
+
+resource "aws_instance" "web" {
+    ami = "our ami id"
+    instance_type = "t2.micro"
+	count = 3
+    tags = {
+        Name = "web"
+    }
+}
+
+Apply this commands for execution of Above code
+
+terraform init
+terraform validate
+terraform plan
+terraform apply --auto-approve
+
+==> it will create the instances with same names but we need one  instance as "WEB", Second as "API" and last one as "DB" like this for that kind of scenario the code will be
+
+resource "aws_instance" "web" {
+    ami = "our ami id"
+    instance_type = "t2.micro"
+    count = 3
+    tags = {
+	  Name = var.instance_names[count.index]
+	}
+}
+
+in variable section:
+
+variable "instance_names" {
+  type = list
+  default = ["Web-server", "Api-server", "DB-server"]
+}
+
+Apply this commands for execution of Above code
+
+terraform init
+terraform validate
+terraform plan
+terraform apply --auto-approve
+
+=================================================
+
+Conditions:
+-----------
+The basic syntax for the conditions is: 
+
+day=monday
+if (day==sunday){
+	print "holiday"
+}
+else {
+	print "go to office"
+}
+
+expression ? "if the condition is true" : "this will run if false"
+
+Here we need to create an EC2 instance Scenario for better understanding
+
+if the env is prod create t3.large instance, if it is false create t2.micro
+
+the syntax for this scenario is
+
+resource "aws_instance" "web" {
+    ami = "our ami id"
+    instance_type = var.isprod ? "t3.large" : "t2.micro"
+}
+
+in variable session:
+
+variable "isprod" {
+    type = bool
+    default = true
+}
+
+Execute the commands to check the code is working or not
+
+terraform validate
+terraform plan
+terraform apply --auto-approve
+
+here the expression is true it will create t3.large, if it is false it will create t2.micro (to check this change default to "false")
+
+--------------------------------------------------------------------------------------------
+
+for this i have another scenario is there
+
+resource "aws_instance" "web" {
+    ami = "our ami id"
+    instance_type = var.env == "PROD" ? "t3.large" : "t2.micro"
+}
+
+in variable session:
+
+variable "env" {
+    type = string
+    default = "PROD"
+}
+
+here the expression is true it will create t3.large, if it is false it will create t2.micro (to check this change default to "DEV")
+
+===========================================================================================================
+
+Functions: (Try this in windows CMD)
+----------
+
+It can do a unit of work whenever we ask. to check this type of scenarios we need to login "terraform console" by executing the command as
+
+"terraform console" it will conntect to inside terminal
+
+max (10,20,500,6000)
+6000 it shows 
+
+min (25,45,85,92)
+25 it shows
+
+join ("-"["ravindra","reddy","venkata"]) 
+output: "ravindra-reddy-venkata"
+
+join (" "["ravindra","reddy","venkata"]) 
+output: "ravindra reddy venkata"
+
+split (" ","ravindr reddy venkata")
+output: 
+ "ravindr",
+  "reddy",
+  "venkata",
+  
+split (",", "ravindra,reddy,venkata")
+output: 
+  "ravindra",
+  "reddy",
+  "venkata",
+  
+Merge function:
+
+if we need to change the name for diffrent resources with diffrent names with merge function. we do not edit the variable tags.
+
+example =
+
+variable "tags" {
+    type = map(string)
+    default = {
+        Name = "timing"
+        Terraform = "true"
+        Environment = "DEV"
+    }
+}
+
+i need to change name as timing-rds-sg for security group purpose instead of timing. In this scenario we can use merge function.
+
+the syntax will be
+
+resource "aws_security_group" "allow_postgres" {
+  name        = "allow_postgres"
+  description = "Allow postgres inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description      = "TLS from VPC"
+    from_port        = var.postgres_ports
+    to_port          = var.postgres_ports
+    protocol         = "tcp"
+    cidr_blocks      = var.cidr_list
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = merge (
+    var.tags, {
+      Name = "timing-RDS-SG"
+    }
+  )
+}
+
+here the name only replace with this one remaining this will be same.
+
+to execute this the commands will be:
+
+terraform validate
+terraform plan
+terraform apply --auto-approve
+
+====================================================================
+
+Loops: 
+
+for (int i=0; i <= 10; i++){
+	
+	print "value: $i"
+}
+
+In this scenario we need to create 3 public subnets in multiple availability zones for diaster recovery
+
+The code will be like this
+
+resource "aws_subnet" "public" {
+  for_each = var.public-subnets
+  vpc_id = aws_vpc.main.id
+  cidr_block = each.value.cidr_block
+  availability_zone = each.value.az
+  tags = {
+    Name = each.value.Name
+  }
+}
+
+in variable section:
+
+variable "public-subnets" {
+    default = 
+    {
+        "one" = {
+            cidr_block = "10.0.1.0/24"
+            Name = "public-subnet-01"
+            az = "ap-south-1a"
+        }
+        "two" = {
+            cidr_block = "10.0.2.0/24"
+            Name = "public-subnet-02"
+            az = "ap-south-1b"
+        }
+        "three" = {
+            cidr_block = "10.0.3.0/24"
+            Name = "public-subnet-03"
+            az = "ap-south-1c"
+        }
+
+    }
+}
+
+========================================================================================
+

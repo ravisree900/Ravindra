@@ -1,0 +1,157 @@
+DevOps and Cloud With Siva Terraform
+====================================
+
+Terraform is an Infrastructure as a code tool developed by Harshi crop. 
+
+Advantages:  
+==>	Automated infra as CRUD (Create, Read, Update and Delete), With in a minute we can create, read, update, and delete the code.
+
+==> Version Control System: While we are creating the infrastructure, we have pushed that code into git hub repo with commit ids along with versions and track it properly, it is easy to collaborate also with team members.
+==>	Consistence Infrastructure: Using terraform, we can create similar infrastructure in all environments (like Dev, Test and Prod) without duplicating.
+
+==> Inventory Management: By seeing the terraform code, we can understand the resources we are using, we are no need to go to console and fetch the report.
+
+==> Cost Optimization: It can destroy the infra within a minute, to reduce the cost and other forgetting resources to delete.
+
+==>	Automatic dependency resolution: Terraform will take care of dependency resolution while creating and deleting of resources.
+
+Modular Infra:   DRY  Don’t Repeat Yourself. We can create a single infra code for projects in our organisation by using modules. We can reuse these modules we can create a infra code for multiple projects instead of we are writing from scratch.
+
+
+In Terraform we need to focus on Variables for DRY:
+==================================================
+1. Variables
+2. Data Type
+3. Conditions
+4. Functions
+5. Loops
+---------------------------
+
+1. Variables:
+-------------
+Syntax of Variable code:
+
+variable "name_of_variable" {
+	type = "string"
+	default = "value"
+}
+
+First we need to open visual code studio to write the code.
+
+provider.tf file
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
+# Configure the AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+
+main.tf
+
+resource "aws_vpc" "main" {
+  cidr_block       = var.cidr_block
+  instance_tenancy = var.instance_tenancy
+  enable_dns_support = var.dns_support
+  enable_dns_hostnames = var.dns_hostnames
+
+  tags = var.tags
+}
+
+variable.tf file
+
+variable "cidr_block" {
+    type = string
+    default = "10.0.0.0/16"
+}
+
+variable "instance_tenancy" {
+    type = string
+    default = "default"
+}
+
+variable "dns_support" {
+    type = bool
+    default = "true"
+}
+
+variable "dns_hostnames" {
+    type = bool
+    default = "true"
+}
+
+variable "tags" {
+    type = map(string)
+    default = {
+        Name = "timing"
+        Terraform = "true"
+        Environment = "DEV"
+    }
+}
+
+
+==>  here we need to create 3 files  after that we need to execute the commands.
+
+terraform init
+terraform validate
+terraform plan
+terraform apply --auto-approve
+
+==========================================================================
+
+Here we need to create a security group along with that VPC in main.tf file.
+
+# this security group for postgres RDS, 5432
+
+resource "aws_security_group" "allow_postgres" {
+  name        = "allow_postgres"
+  description = "Allow postgres inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description      = "TLS from VPC"
+    from_port        = var.postgres_ports
+    to_port          = var.postgres_ports
+    protocol         = "tcp"
+    cidr_blocks      = var.cidr_list
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = var.tags
+}
+
+variable "tags" {
+    type = map(string)
+    default = {
+        Name = "timing"
+        Terraform = "true"
+        Environment = "DEV"
+    }
+}
+
+variable.tf
+
+variable "postgres_ports"  {
+  type = number
+  default = "5432"
+}
+
+variable = "cidr_list" {
+  type = list
+  default = ["10.0.1.0/24","10.0.2.0/24"]
+}

@@ -1,0 +1,77 @@
+We will create a private cloud and assign ip range  10.0.0.0/16
+
+  32
+- 16
+---------
+   16
+
+  2 power 16  = 65536 ( ip address )
+
+So, in our private cloud we can have only 65536 machines only.
+
+++++++++++++
+We have different types of servers
+1) Web servers
+2) Application server
+3) database servers
+
+
+We cannot dump all the servers directly.
+
+Web server -  We want everyone in the world to access web server.
+Always request  will be sent to web server.  
+From the webserver , request will be sent to database server.
+
+
+
+User request, should not sent to database directly.
+
+So, we will be creating two subnets
+one subnet for webserver
+one subnet for database server.
+
+For one subnet, I provide range  10.0.1.0/24
+For 2nd subnet, I provide range  10.0.2.0/24
+
+By default, subnet are private.
+I want to make one  subnet as public.
+
+As, we want to make webserver as public  
+
+Practicals
+-------------------
+Select Mumbai Region.
+Step 1: Create VPC  ( 10.0.0.0/16 )
+
+Services ---> Network and content delivery --> VPC
+
+We have some default VPC, Default subnet, Default Route tables.
+
+Your VPC ----> Create VPC --> 
+Name Tag             - MyVPC
+IPV4 CIDR Block  - 10.0.0.0/16
+( Note : Our VPC can have maximum 2 power 16 machines )
+Create --> Close
+
+
+Step 2:   	
+Inside VPC, we are creating 1st  subnets.
+In dashboard ---> Subnets ---> Create subnet 
+Name Tag -  ( We will discuss later )
+VPC  -- MYVPC  ( Select our subnet )
+Availability Zone -- ap-southeast-1a  ( Select any zone )
+IPV4 CIDR Block - 10.0.1.0/24
+Name Tag - 10.0.1.0/24 - ap-southeast-1a  (  IPV4  -  availability is the naming convention )
+Create ---> Close
+
+
+Step 3:   	
+Inside VPC, we are creating 2nd  subnets.
+In dashboard ---> Subnets ---> Create subnet 
+Name Tag -  ( We will discuss later )
+VPC  -- MYVPC  ( Select our subnet )
+Availability Zone -- ap-southeast-1b  ( Select different zone /any zone )
+IPV4 CIDR Block - 10.0.2.0/24
+Name Tag - 10.0.2.0/24 - ap-southeast-1b  (  IPV4  -  availability is the naming convention )
+Create ---> Close
+

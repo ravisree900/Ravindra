@@ -1,0 +1,113 @@
+A load balancer accepts incoming traffic from clients and routes requests to EC2 instances 
+( Targets). 
+The load balancer also monitors the health of its registered targets and ensures that it routes traffic only to healthy targets. 
+When the load balancer detects an unhealthy target, it stops routing traffic to that target. It then resumes routing traffic to that target when it detects that the target is healthy again.
+
+
+
+
+
+
+Step 1: Create Linux Machine
+Launch instance ---  Amazon Linux -- No of intances - 1 --- Name Tag- Lin-1 --- Security Group - LinSG
+Description - LinSG
+Add Rule
+HTTP
+
+Launch 
+
+---------- 
+
+
+Step 2: COnvert pem to ppk file
+
+
+Step 3:  Access the machine
+
+Step 4: Run the commands to install web package
+sudo su
+ yum update -y
+ yum install httpd -y
+cd    /var/www/html
+echo "MyGoogle-1" > index.html
+ls
+service httpd start
+chkconfig httpd on
+
+
+
+
+Step 5: Access the webserver by using public_ip
+
+
+
+Step 6: Launch one more Linux Machine and install Web package
+AmazonLinux -- Step 3: Advanced Details - User data 
+
+#!/bin/bash
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "MyGoogle-2" > index.html
+service httpd start
+chkconfig httpd on
+
+
+Next -- Add Name Tag -- Step 6: Select existing security group -- Choose existing key pair -- Launch instance.
+
+
+
+Step 7: Create load balancers
+Select classic load balancer
+
+Load Balancer Name - MyLB --> Next ----> select existing security group ---> NExt -- Step 4: 
+
+Response Timeout - 2 Seconds
+Interval - 5 Seconds
+Unhealthy threshold - 2 
+Healthy threshold - 2 
+
+Next --  Attach both the instances
+Next -- Next --Create
+
+
+
+
+Step 8: Lest verify the 2nd instance manually
+Select public ip and paste in browser
+
+Step 9: Access the load balance by using DNS   
+and experience the load balancer.
+
+Step 10:  If one server is down, it should redirect the traffic to another server.
+
+1) we can stop/terminate the machine
+2) remove the file / rename the file
+
+Lets remove index.html file in server1
+
+Go to putty
+ls  ( To see the list of files )
+
+# rm index.html
+
+Now, access the load balance  , traffic should be redirected to 2nd server.
+
+
+How can we know, which instance is down?
+Goto load balances ---> instances tab,
+We can see the status is OutOfService.
+
++++++++
+Lets re create index.html file
+
+# echo  "Google-1" > index.html
+
++++++++++++
+
+Now load balance will start sending the traffic to server1
+
+++++++
+To avoid billing ----> remove both the instance  ----> delete load balances
+

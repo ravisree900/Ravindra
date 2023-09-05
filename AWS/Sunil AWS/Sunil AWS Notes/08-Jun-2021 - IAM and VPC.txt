@@ -1,0 +1,169 @@
+AWS CLI  ( Command line Interface )
+------------------------------------------------
+
+To connect from CLI, We need to provide  Access Keys and secret key.
+
+Observation, in IAM dashboard,  root access keys are deleted!!!
+
+
+Generation of root access keys
+-----------------------------------------
+Select "Delete your root access keys"  ---> Manage security credentials ---> Continue to security credentials---> 
+Access keys ( access key ID  and secret access key ) --  create new access key ---> Show access key.
+Download the key file ---> Close
+
+Access Key ID:
+AKIAJ5UQIJEMYYTB4QNA
+Secret Access Key:
+y33k+6K2Ov2j5K7FEhDNCHCMvGKOGLwixlrRFSOa
+
+
+
+
+Now, goto dashboard   , "Delete your root access keys"  is not tick.
+
+As keys are ready, we can access to AWS from CLI
+
+We need to download and install AWS CLI tool.
+
+Search "Aws cli tool for windows"  in google
+select the 1st link ( docs.amazon.com )
+
+select  " Download the AWS CLI MSI installer for windows 64 bit"
+download and run the file.
+Once the CLI is intalled, we can see it in control panel -- uninstall program 
+We can see "AWS Command line interface" ( Just observation )
+
++++++++++=
+Open command prompt
+
+> aws configure
+AWS access key ID  [*****]:    enter access key ID from file downloaded 
+AWS secret Access key [***  ]: enter secret key ID from file downloaded  
+Default region name :ap-south-1
+
+
+Note: ap-south-1  ( Is nothing but region name of mumbai.
+		We can get this information from google ) 
+Default region is north virginia
+
+Default output format : text
+
+We get the prompt. ( We have logged in )
+>  
+
++++++++++++++++++++++++
+From the console,  create 2 buckets.
+
+We can see the list of buckets from command line
+
+search in google " aws s3 commands"
+( Note: we do not need to remember commands )
+under available commands
+select ls  ( open in new window )
+
+under Examples
+aws s3 ls
+
+Run the command
+We can see the buckets!!!
+
+++++++++++++++
+under available commands
+select mb  ( open in new window )  (mb - make bucket )
+
+Under Examples
+aws s3 mb s3://mybucket         ( mybucker is the name )
+
+Run the command  
+
+We can see the new bucket in console!!!
+
++++++++++++++++++++
+I want to upload the file to the bucket
+
+under available commands
+select cp  ( open in new window )  (mb - make bucket )
+
+copying the local file to S3
+aws s3 cp test.txt   s3://mybucket7654376
+
+( test.txt should be available in current path )
+
+We can see the file available in the bucket in console.
+
+++++++++++++++++++
+Creating user from command line
+--------------------------------
+Search in google " aws iam commands"
+
+Available commands
+click on create-user
+Under Examples
+To create an IAM  user
+
+> aws iam create-user --user-name hari
+
+copy and paste
+
+Now, user is created from the command line.
+We can also check from console.
+
+++++++++++
+
+We have 1000's of commands in AWS
+Most of the opearations we can also do it from CLI
+
+We do not need to remember the commands
+
+We have experienced AWS CLI from windows machine.
+
+++++++++++
+
+++++++++++
+
+
+
+
+Lets learn how can we work with AWS CLI  on linux?
+
+Lets create a new EC2 machine of linux
+
+Services --->EC2 --> Amazon linux --Next --> Next
+Security group  ( open SSH and HTTP ) -- review and launch-> Launch.
+
+Connect to machine using putty
+
+
+
+Now, we need to install AWS CLI  tool on linux
+Note:  All EC2 machine comes with AWS CLI installed on it.
+
+so, we do need to install AWS CLI on the machine, which we have created.
+
+$  sudo su 
+# yum update -y
+#  aws configure
+
+AWS access key ID  [*****]:    enter access key ID from file downloaded 
+AWS secret Access key [***  ]: enter secret key ID from file downloaded  
+Default region name :ap-south-1
+
+
+Note: ap-south-1  
+
+Default output format :   just hit enter
+
+#
+
+Lets create group
+--------------------
+# aws iam create-group  --group-name  devops
+
+Lets create user
+
+# aws iam create-user --user-name raj
+
+( We can verify users and group from console )
+
+++++++++++++

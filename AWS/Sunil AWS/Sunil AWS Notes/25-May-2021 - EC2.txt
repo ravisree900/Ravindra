@@ -1,0 +1,171 @@
+Auto Scaling
+------------------------
+
+Auto Scaling helps you ensure that you have the correct number of EC2 instances available 
+to handle the load for your application. 
+You create collections of EC2 instances, called Auto Scaling groups. 
+You can specify the minimum number of instances and the maximum number of instances in Auto Scaling group, and Amazon EC2 Auto Scaling ensures that your group never goes above this size.
+
++++++++++++++++++++++++++
+Step 1: Create load balancer.
+Step 2: Create Launch configuration  
+Step 3: Create Auto scaling group.   --  min  , max
+Step 4: Create Topic in SNS ( Simple Notification Service )
+Step 5: Create Alarm in CloudWatch Service
+Step 6: Add Policy in Auto Scaling
+
+------------------------------
+
+
+Step 1: Create load balancer
+Select Mumbai location
+EC 2 dashboard --  load balancer --  create load balancer
+Load balancer Name - SampleLB25
+Next -- Create new Security group 
+Security group name -  Sample-Sg25
+Description - Sample-Sg25
+
+Lets open two ports   SSH  and HTTP
+Next --> Configure health check
+Response timeout -2
+Interval -5
+Uhealthy  threshold - 2
+Healthy threshold  -2
+Next -- Next -- Review and create --> Create---> Close
+
+
+
+Step 2:
+Creating launch configuration
+--------------------------------
+Under Auto Scaling
+Select Launch configurations  ---> Create launch configuration
+
+Name: SampleLCG25
+
+
+AMI - ami-040589e8273e08d6e
+
+
+
+Step 2: t2 micro
+
+
+	In advanced Details     User data
+
+
+#!/bin/bash
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "MyGoogle-2" > index.html
+service httpd start
+chkconfig httpd on
+
+Next --> Select existing security group  : Sample-Sg25
+
+Create new key pair -- Key Pair name -  SampleKP25  --  download key pair --> create launch configuration.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+Step 3: Create Auto Scaling Group
+Select the Launch Configuration ---> Actions --- Create Auto Scaling Group
+
+Step 1: Auto Scaling group name - SampleASG25
+
+Step 2: Subnet -- ap-south-1a
+
+Step 3: Attach Existing Load Balancer ---> Choose from Classic Load Balancers -- Select Load Balancer
+
+
+Step 4:Configure Group size ( Take Defaults )
+Step 5: Next
+Step 6: Next  -- Provide Name Tag
+Step 7: Review and Create
+
+As the desired capacity is 1 , By this time one EC2 Machine could have been created.
+
+
++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+Step 4: Create Topic in SNS
+
+Services --   Application Integration  --  Simple Notification Service
+
+Create Topic
+
+Type - Standard	
+
+Name - MyTopic1
+Display Name - MyTopic1
+
+Create topic.
+
+Add subscriptions to the topic
+
+Create Subscription
+Protocol - Email
+
+Endpoint -  sunildevops77@gmail.com
+
+Create Subscription.
+
+Confirm the subscription.
+
+
++++++++++++++++++++++++++++++++++++++
+
+Step 5: Create Alarm in CloudWatch
+
+Services ---- Management & Governance --- CloudWatch
+
+Alarm ---  Create Alarm
+
+Select Metric ---> EC2 --- By Auto Scaling Group ---- Select Auto Scaling Group Name  , Metric Name - CPUUtilization 
+-- Select Metric ---Conditions ---  Static --  Greater than 80 -- Next ---Select  existing SNS topic ( MyTopic1 ) -- Next ---
+Alarm Name -  My_Alarm1 -- Next -- Create Alarm.
+
+
+Similarly Create another Alarm  for CPU Utilization <30
+Name - My_Alarm2
+
+++++++++++++++++++++++++
+
+Step 6: Add Policy in Auto Scaling
+
+Select AutoScaling groups -- Automatic Scaling Tab --- Add Policy
+
+Policy Type - Simple Scaling
+Scaling policy name -- Increase_Policy
+CloudWatch Alarm - My_alarm1
+
+Take the Action - Add - 1  Unit ( EC2 Machine )
+
+Create
+
+Similary, we need to create another Decrease Policy
+
+Scaling policy name -- Decrease_Policy
+CloudWatch Alarm - My_alarm2
+
+Take the Action - Remove - 1  Unit ( EC2 Machine )
+
+Create
+
+++++++++++++++++++++++
+
+Deleting process
+-----------------
+1) Delete Autoscaling
+2) Delele launch configuration ( Instances will be terminated automatically) 
+3) Delete Load balancer
+4) Delete Topic
+5) Delete Alarm
+

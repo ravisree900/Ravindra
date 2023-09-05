@@ -1,0 +1,245 @@
+We will create a private cloud and assign ip range  10.0.0.0/16
+
+  32
+- 16
+---------
+   16
+
+  2 power 16  = 65536 ( ip address )
+
+So, in our private cloud we can have only 65536 machines only.
+
+++++++++++++
+We have different types of servers
+1) Web servers
+2) Application server
+3) database servers
+
+
+We should not dump all the servers directly.
+
+Web server -  We want everyone in the world to access web server.
+Always request  will be sent to web server.  
+From the webserver , request will be sent to database server.
+
+
+
+User request, should not sent to database directly.
+
+So, we will be creating two subnets
+one subnet for webserver
+one subnet for database server.
+
+For one subnet, I provide range  10.0.1.0/24
+For 2nd subnet, I provide range  10.0.2.0/24
+
+By default, subnet are private.
+
+
+
+I want to make one  subnet as public.
+
+As, we want to make webserver as public  
+
+Practicals
+-------------------
+Select Mumbai Region.
+Step 1: Create VPC  ( 10.0.0.0/16 )
+
+Services ---> Network and content delivery --> VPC
+
+We have some default VPC, Default subnet, Default Route tables.
+
+Your VPC ----> Create VPC --> 
+Name Tag             - MyVPC
+IPV4 CIDR Block  - 10.0.0.0/16
+( Note : Our VPC can have maximum 2 power 16 machines )
+Create --> Close
+
+
+Step 2:   	
+Inside VPC, we are creating 1st  subnets.
+In dashboard ---> Subnets ---> Create subnet 
+Name Tag -  ( We will discuss later )
+VPC  -- MYVPC  ( Select our subnet )
+Availability Zone -- ap-southeast-1a  ( Select any zone )
+IPV4 CIDR Block - 10.0.1.0/24
+Name Tag - 10.0.1.0/24 - ap-southeast-1a  (  IPV4  -  availability is the naming convention )
+Create ---> Close
+
+
+Step 3:   	
+Inside VPC, we are creating 2nd  subnets.
+In dashboard ---> Subnets ---> Create subnet 
+Name Tag -  ( We will discuss later )
+VPC  -- MYVPC  ( Select our subnet )
+Availability Zone -- ap-southeast-1b  ( Select different zone /any zone )
+IPV4 CIDR Block - 10.0.2.0/24
+Name Tag - 10.0.2.0/24 - ap-southeast-1b  (  IPV4  -  availability is the naming convention )
+Create ---> Close
+
+
+Observer Available IPV4  column  it is showing as 251
+But, we should get 2 power 8 Right!! ( 256 )
+That means 5 ip address are missing.
+
+Note: In every subnet, 5 ip address are reserved.
+Just search in google "Reserved ip address in AWS"
+Select  VPC and subnet sizing
+
+We can see the list of ip's which are reserved.
+
+10.0.0.0
+10.0.0.1
+10.0.0.2
+10.0.0.3
+10.0.0.255
+
++++++++++++++++++++++++
+Note: Every subnet will be by default private.
+We want to make one subnet as public.
+To make subnet public its two step process.
+Step 1: we need to enable public IP	
+
+Select the subnet  (  10.0.1.0/24 )  --> Actions --> Modify Auto Assing IP Settings 
+---> Enable Auto Assing public   IPV4 Address -- Save
+( From now, public IP will be assigned to the machines in this Subnet )
+
+Step 2: Create internet gateway. And attach internet gateway to VPC.
+
+Select Internet  Gateway 
+( We have one default internet gateway. Do not distrub this )
+Create internet gateway ---> Name Tag:  MyIGW  ---> Create -- Close
+
+Observation: Status is detached.
+Select the MyIGW ---> Actions -----> Attach to VPC -- Select our VPC ---> Attach.
+
++++++++++++++
+
+Now, we cannot attach Internet Gateway to subnet.
+So, we create new Route table.
+
+Select , Route tables   
+Observation: We have two route tables.
+One route table attached to default VPC.
+Another route table attached to our VPC (  MyVPC )
+
+This means, one default route table is create automatically, when we create our own VPC.
+
+Creating new route table
+-----------------------------------
+Create Route table ---> Name Tag: InternetRT  ---> VPC: MyVPC ---> Create --> Close
+
+
+Now, we need to connect Route table to Subnet.
+Select the route table ( InternetRT )  ---> Subnet Associations tab ---> Edit Subnet Associations ---> Select the subnet  (  10.0.1.0/24 ) -- Save
+
+Now, Another end to route table, we need to connect to Internet Gateway
+
+Select the route table ( InternetRT )  ---> Routes tab --->Edit routes --->
+ Add route ----> Target: Internet Gateway  , select MyIGW    Destination : 0.0.0.0/0  ( Mandatory )  -- Save routes -- Close
+
+Now, our Subnet is public Subnet.
+
+++++++++++++
+Now, Lets launch webserver in public subnet.
+Services ---Ec2 ---- Launch instance  -- Step3  Network : MyVPC
+				          Subnet: 10.0.1.0/24
+
+Additional Details -- User Data
+
+#!/bin/bash
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "MyGoogle-2" > index.html
+service httpd start
+chkconfig httpd on
+
+
+Next -- Next  -- Name Tag: WebServer   ---> Next  --  Security Group : WebSG31  , Description: WebSG31
+
+ADD RULE
+
+Type		Source
+SSH		Anywhere	
+HTTP		Anywhere
+
+Review and launch --- Launch -- Download keypair --> Launch-- View Instance
+
++++++++++++++++++++++
+
+Lets Launch  Database Server in Private SUbnet.
+
+Services ---Ec2 ---- Launch instance  -- Step3  Network : MyVPC
+				          Subnet: 10.0.2.0/24
+
+Name Tag: DbServer --  ---> Next  --  Security Group : DbSG31  , Description: DbSG31
+
+Change Type   from SSH to MYSQL/Aurora
+
+Type		Source		
+MYSQL/Aurora	Custom		10.0.1.0/24
+
+( MySQL Port is open to entire subnet )
+Review and launch -- Launch --> Create new keypair --> launch instances --- View instances
+
+++++++++++++++++
+
+
+Observe the private IP address of the webserver.
+The series will be 10.0.1.x
+
+Now, check the Dbserver.
+It should not have public IP.
+and Private IP series should be 10.0.2.x
+	
+Now, lets check, are we able to access webserver?
+Copy the public IP in the browser
+
+++++++++++++++++++++
+Now, lets have some testing scenarios
+1) Detach  RT  to  public Subnet.  
+
+Select route tales --- Subnet Assocations ---> Edit Subnet Associations --- UNCHECK the subnet ( 10.0.1.0/24 ) --- Save
+
+Result: Are you able to webserver??
+Refresh the browser ( Page will not be loaded )
+----------
+Lets attach it back.
+Are we able to access the webserver
+
+
+2) Can we access the webserver from putty?
+convert pem to ppk  file and connect from putty.
+Yes!! we can access, as we have opened SSH port.
+
+Detach RT to public subnet ( similar to above )
+
+Immediately, SSH connection is lost.
+-----
+Lets attach it back.
+Are we able to access the webserver from putty.
+
+3) Can we access database server
+convert the dbserver pem file to ppk file
+
+
+Select the EC2 instance ---> Connect 
+
+Observation: we get username@privateIP
+Try connecting from putty. 
+It fails.
+
+As the instance is in private subnet nor the internet is available, we cannot access from our laptop.
+
+Deletion Process
+-------------------
+1) Terminate both the EC2 instances.
+2) Select myVPC  , delete VPC
+When VPC is deleted,  Internet gateways, Route tables and subnets  will also be deleted automatically.
+
+++++++++++
+
+

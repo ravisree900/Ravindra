@@ -1,0 +1,106 @@
+Route 53  ( Domain name system ) - 53 - DNS port number
+=============
+
+It extremely reliable and cost effective way to route end users to Internet applications by translating names like www.example.com into the numeric IP addresses like 192.0.2.1 so  that computers use to connect to each other. 
+
+So, it is resposible to convert IP address to name, name to IP address.
+
+when we use "google" in browser address bar, it will be converted to IP Address.
+
+When we launch EC2 machine, we get public IP and private IP, 
+we also get DNS name.
+DNS Server is responsible to assign DNS name to the machine.
+
+Note: 53 is DNS port number.
+
+Scenario
+-------------
+Multiple webservers are connected to Load Balancer.
+Load balancer DNS name is not user friendly.
+
+By using route53, we buy the domain name.
+We connect the domain name to load balancer.
+We provide route 53 user friendly name domain name to public.
+++++++++++++++++++
+2nd Advantage:
+Generally  webserver and Load balancer will be in same availability zone.
+
+If  Availability zone is lost?
+
+We can create load balancer and attach webserver present multiple availability zones. If one availability zone is lost, LB will direct to another availability zone.
+
+So, load balancer handles webserver failure and availability zone failure.
+
+If  Region is lost?
+We cannot create load balancer outside region.
+In this create we use Route53.
+
+We connect multiple regions to Route 53
+Note: Route 53 helps from regional failures.
+
+-------------
+How Route53 will distribute the traffic?
+ 50% - 50%
+20% - 80%
+Main - failover
+
+It depends on routing policy.
+
+
+We have 5 routing policies
+---------------------------------
+1) Simple
+2) Weighted
+3) Latency
+4) Failover
+5) Geolocation
+
+
+1) simple
+-----------------
+This is default routing policy.
+Using simple routing policy we get the 1st advantage.
+This is all about providing Route 53 user friendly domain name to public.
+We cannot get the 2nd advantage
+We can connect only one region.
+
+2)  Weighted
+----------------------
+In this policy, we connect two regions.
+Based on the weights we assign, load will be distributed.
+
+Weight can be 
+1) 80 - 20 ( 80% traffic to region 1, 20% to region 2 )
+2) 60 - 40  
+etc.
+
+
+3) Latency
+--------------------
+The term "Latency" refers to delay due to network traffic.
+
+The policy  continuously moniter network traffic ( latency) in multiple regions by sending ping requests.
+Diverts the traffic to the region which has less latency.
+
+4) Failover
+---------------------------
+We will define one region as "Main" ( Active )
+another region as  "Standby" ( Passive )
+
+ROute 53 will divert all traffic to Main region.
+Incase "Main" region is lost, the Route 53 will divert the traffic to "Standby"
+Route 53 will monitor  the health of load balancer continuously.
+
+5) Geolocation
+-----------------------
+If a user request website from london, he will be directed to london region.
+If a user request website from India, he will be directed to india region.
+
+Request should be diverted based on the origin of the location.	
+
+Is is based on geographical location.
+
++++++++++++++++++
+Except simple routing policy, remaining four policies are related to multiple regions.
+
++++++++++++++++++++++++++++++++++

@@ -1,0 +1,54 @@
+Launch Linux machine
+-------------------------------
+Create new EC2  Machine --  
+If any key pairs - delete
+If any security groups - delete  ( except default )
+
+Observation:
+Storage ( 30 gb for windows , 8 gb for linux )
+Security Group (  RDP for windows, SSH for Linux )
+
+AMI -  Amazon Linux 2 --->  T2.micro --> No of instance 2 -- tag - MyLinux ---> Change security group Security group name - LinSG , Description - LinSG ( optional ) - Review launch -- Create new keypair -- download key pair --  View Instances
+
+
+Observation - Two machines created.
+Lets change the names to   MyLinux-1, MyLinux-2
+
+Credentials required for windows machines are (  dns,  username and password )
+
+
+We use putty tool , to connect to linux machine.
+And, putty required  ppk file ( Putty private key )
+So, we need to convert .pem file to .ppk file.
+
+We use puttygen  to get the ppk file.
+
+Download from google using the  keywords "putty and puttygen"
+
+Under alternate binary files
+select putty.exe ( 64 bit )
+select puttygen.exe  ( 64 bit )
+
+
+Open puttygen  --  load  -- Save private key -- Save key without passphrase  ( Yes )  -- Save 
+
+Credentials required for putty -- 
+Hostname  -  username@dns       ( We get this from ssh command )
+
+select SSH -- Auth 	-  selecy ppk file using browse option --> Open
+
+username is - ec2-user   ( We get this from ssh command )
+
+---
+Now lets connect to 2nd linux machine 
+
+We do not need to conver the pem to ppk, as both the machines have same pem file.
+
+Right click on title bar of putty -- new session -- provide details -- change colors ( for easy identification )
+
+
+Note: Both machines have different DNS names.
+Terminate both the machines
+
+++++++++++++++++++++++
+Session terminated abnormaly.

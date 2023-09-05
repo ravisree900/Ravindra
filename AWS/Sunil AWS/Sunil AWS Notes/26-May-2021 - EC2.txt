@@ -1,0 +1,139 @@
+Topics
+----------
+1) Status checks
+2) Protecting instance with accidental termination?
+3) Scale  up  / scale out
+4) Creating our own AMI
+5) Snapshot
+
+Select Mumbai region
+Launch instance ---> Amazon linux ---> Review and launch  ( Takes the dafult options)
+Launch --> Create new keypair ---> View instance
+
+Lets name the instance as - test
+
+Observe the status check - Initializing  ,  2/2 checks passed
+
+In availability zone , we have physical hard disk.
+On top of physical hard drive ---> we have virtualization software ( Xen hypervisor )
+
+On Virtualization software , we have Ec2  machine
+
+What is the meaning of 2/2 check passed?
+check 1 - Instance status check
+check 2 - System status check
+
+Lets say  we have status check as  1/2 ?
+what does that mean?
+It means instance status check is failed.
+
+Lets say  we have status check as  0/2 ?
+what does that mean?
+It means system status check is failed.
+When system status ( hard ware ) is failed , obviously  instance will fail.
+
+Troubleshoot
+-----------------
+For status check as  1/2 ?
+Solution: Reboot the instance
+When we reboot, OS will be reloaded.
+
+
+For status check as  0/2 ?
+Solution: Stop and start the instance
+Ec2 machine will be migrated to another physical machine
+
++++++++++++++++++++++++
+
+
+
+Select the instance---> Status check tab
+We can see  System status check and instance status check
+
++++++++++++++++++++++++
+How can we protect the instance with accidental termination?
+Go to actions ----> instance settings ---> change termination protection --> yes, Enable
+
+Now, we cannot terminate the machine.
+
+Incase you want to terminate, just disable change termination protection
+
++++++++++++++++++++++++++++++
+
+
+
+Understanding terminology
+1)  scale up and scale down
+2)  scale out  and scale in
+
+
+
+
+1) scale up  and scale down -- 
+
+scale up  : This is also called as vertical scaling
+	Lets say i have one machine of 10gb hard disk.
+                  Adding additional 10gb  hard disk in the same machine is called  scaleup.
+
+
+
+Scale out :  This is called horizontal  scaling 
+	  Lets say i have one machine of 10gb hard disk.
+                    Adding additional machine with 10gb hard disk  
+	
+
+Note: Auto scaling comes under  scale out
+
+Does AWS support scaleup?
+Yes,  Once the instance is created, we can increate and decrease the hardware (  CPU, RAM, HDD )
+
+How can we do that?
+Observe the machine we have launched, instance type is t2.micro 
+t2.micro comes with 1 CPU core and 1 GB ram.
+Can we increase?
+First we need to stop the machine.
+then go to
+Actions---> Instance settings ---> Change instance type
+Now, we have multiple options, Lets select  t2.medium --- Apply
+
+Note: t2.medium  comes with 2 CPU cores and 4 GB ram
+
+Now, Lets change the instance type to t2.micro ---  Apply
+
+Can we increase the hard disk
+-----------------------------------
+TO increase the hard disk, we do not need to stop the machine.
+Machine can be in running state.
+Lets start the machine
+Go to volumes option in dashboard, Select the Volume 
+Actions ----> Modify  Volume ---- Size - 10  ( change to required size ) --> Modify--> Yes --> CLose
+It will take time to reflect.
+
+
+++++++++++++++++++++++++
+Attach / Detach Volume
+
+
+
+
+Launch instance --> Amazon Linux ---> Next -- Next -- Step 4: Add two new volume
+Observer  Delete on termination  ( only 1st volume is selected ).
+This means, when we terminare the machine, only C: Drive is termintated )
+
+Now select 2nd and 3rd check box  ( now all volumes will be terminated )
+
+Next ---> Add name tag -- sunil --> Next --- Next -- Launch -- Select existing key pair ---> Launch -- View Instance
+
+Now, I want to detach one volume ( not c drive )  ( from Sunil machine  and  add to  another machine ( demo )
+
+Go to volume  
+Select the 1st volume --> Actions -- Detach volume-- Yes, detach
+Status will be changed to available
+
+Select the same volume --> Action -- Attach Volume -- Select demo instance --> Attach.
+
+Now, If you want to attach or detach C: Drive ( root )   
+We need to stop the machines
+
+++++++++++++++++++++++++++++
+

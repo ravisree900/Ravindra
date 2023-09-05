@@ -1,0 +1,161 @@
+
+++++++++++++++++
+
+Database Module
+--------------------------
+1) RDS   - SQL
+
+----------------
+SQL ( Structued Query language )
+RDS  ( Relational Database Service )
+
+Two type of backups
+----------------------------
+1) Manual ( DB Snapshots )
+2) Automated
+
+We take the backup, in the form of snapshot.
+If database is lost, we restore snapshot as database.
+We will have downtime, in this case.
+
+===========
+Everyday AWS will take the full backup of database automatically.
+Backup is maintained for the last 35 days ( Rentention Period )
+Default retention period is 7 Days
+AWS will take incremental backup in every 1 min.
+
+Incremental backup are called transactional logs.
+
+If we intentionally delete the database, backup will also be deleted.
+
+Manual backups are user initiated.
+Even if you delete the database intentionally, we will have manual backups.
+
+How can we eliminate the downtime
+-------------------------------------------------
+By using multi availability zone.
+
+Read Replicas
+---------------------
+To protect from load.
+
+++++++++++++++++++++++++++++++++++++
+
+SQS ( Simple Queue Service) - Theory
+-------------------------------------------
+
+
+		Route 53  (  www.sunilcloud.com )
+
+
+
+
+		LB
+
+
+
+	Ws1          Ws2                    Ws3
+
+
+                                    SQS
+
+
+		AS1		AS2
+
+		DB
+
+The backup mechanism for Application server is SQS
+
+All the requests from webservers will be stored in SQS in Queue format.
+Application server will pull the requests from SQS.
+SQS will control the flow of the requests.
+
+
+Once the request is pulled from the SQS, the request in SQS will not be deleted. It will be invisible for 30 sec
+
+Within 30 sec APplication server should process the request.
+Within 30 sec, if Application server process the request, it will be deleted from SQS.
+
+
+Within 30 sec, if Application server unable process the request, it will be visible again in SQS.
+
+If Application server takes more than 30 sec?
+We can increase the visibility time out upto  12 hrs
+
+By default SQS will maintain the request for 4 days.
+
+We can set maximum request to 14 days
+
+++++++++++++++++++++++++++++++
+
+
+
+
+
+
+SNS ( Simple notification service )
+-----------------------------------
+When auto scaling launches new machine, we need notification.
+In route53, failover routing policy, one region is down, we need notification.
+
+We can receive the noficiation by using SNS
+
+Subscribers --  Are nothing but users.
+
+
+Step 1: We create a group  ( It is also called topic )
+We add email address of subscribers into the group.
+
+The process of adding subscribers to the group, is called subscription.
+
+Notifications we can receive through
+1) Email  with normal text.
+2) Email with JSON Script
+3)Mobile SMS
+4) Http / https requests
+
+Practicals
+-----------------
+Services -- Application Integration - Simple notification service.
+
+Create topic - MyTopic1 -- Next Step --Create topic
+
+Scroll down
+Click on Create subscription 
+Protocol - Email
+Endpoint - sunildevops77@gmail.com
+Create Subscription
+Observation:  Status as pending confirmation.
+
+When the status is confirmed?
+We need to login to email and accept the email.
+We will get email with subject - AWS Notification - Subscription COnfirmation.
+Confirm the subscription.
+
+Now, goto SNS and refresh
+Observation: Status as confirmed.
+
+Now, lets test the SNS with respect to Autoscaling
+
+InEC2 dashboard -- select launch configuration -- Create launch configuration -- Next --
+Name - MyLC -- Next -- Next --Review -- Create launch configuration.
+
+Create an auto scaling group using this launch configuration.
+Group Name - MyASG  
+Subnet - 1b -- next -- Next -- 
+Step 3: Add notification
+
+send a notification to -  My AWS ( we can see our topic name )
+( We get notification whenever we launch, terminate, fail to launch, fail to terminate )
+
+( Lets  say, I want to add another email.
+Go to subscriptions -- Create subscriptions --  Select existing topic  -- Protocal : Email
+
+Endpoint - Enter new email  )
++++++++++
+cancel autoscaling group, delete launch configuration.
+Select the subscription -- Delete
+Select the topic -- delete
+
+++++++++++++++++++++++++++
+++++++++++++++++

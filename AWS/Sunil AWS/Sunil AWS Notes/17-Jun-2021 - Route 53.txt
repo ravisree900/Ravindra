@@ -1,0 +1,340 @@
+Practicals
+------------
+
+Services ----> Networking and content delivery ---> Route 53
+
+Step 1: We need to buy a domain name.
+
+Register domain
+hello.com   ( unavailable )
+
+sunil-test-t.com  -- Add to cart -- Continue  
+
+Once you buy the domain,
+We the see the domain in dashboard -- Registered domain.
+
+++++++++++++++++++++++++++
+Lets make the setup ready
+
+Select London region , create two webservers and attach to load balancer.
+Select Sydney region , create one webservers and attach to load balancer.
+
+-----------
+	
+Select london region ---- Ec2 -- Launch instance
+Amazon linux --- Next -- no of instance 1   - advanced Details
+
+#!/bin/bash
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "London-1" > index.html
+service httpd start
+chkconfig httpd on
+
+
+Next -- Next -- Name tag - London-1 --Security group-- 
+Create new Group  - MyWebSG9
+ ( open SSH and HTTP )
+Review and launch -- new key pair - mylondon9.pem  -- launch.
+
+Similary , lets launch another webserver.
+
+Amazon linux --- Next -- no of instance 1   - advanced Details
+
+#!/bin/bash
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "London-2" > index.html
+service httpd start
+chkconfig httpd on
+
+
+Next -- Next -- Name tag - London-2 --Security group -- Select existing 
+Group Name - MyWebSG9  (  SSH and HTTP )
+Review and launch -- choose existing key pair - mylondon10.pem  -- launch.
+View instances.
+
+--------
+Create load balancer -- Classic load balancer 
+
+Load Balancer Name: London-LB ----Next -- Select existing security group - MyWebSG9 --Next
+Response Timeout  - 2
+Interval - 5
+Unhealth threshold - 2
+Healthy Threshold - 2
+Next -- add EC2 -- Select both the instance -- Review -- create -- close
+
+==========
+
+
+
+
+Lets Switch to Sydney region 
+Instances -- launch instance --  Amazon linux --- Next -- Step 3: Advanced Details
+
+
+#!/bin/bash
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "Sydney1" > index.html
+service httpd start
+chkconfig httpd on
+
+
+NExt -- Next -- Name Tag:  Sydney-1  -- Next -- New Security group : SydSG9
+					Description: SydSG9
+
+Type		Source
+SSH		Anywhere
+HTTP		Anywhere
+
+Review and launch -- launch - New key pair: mysydney9.pem ---  download -- launch
+
+-----------
+Create load balancer ---CLassic -- Load balancer Name: Syd-LB  -- 
+Next -- select existing security group ( SydSG9 ) -- Next -- Step 4: Configure health check
+
+Response Timeout  - 2
+Interval - 5
+Unhealth threshold - 2
+Healthy Threshold - 2
+Next -- add EC2 -- Select the instance -- Review -- create -- close
+
+
+Testing the load balancer
+---------------------------
+Select London load balancer -- DNS name
+try from browser  ( Works!!! )
+
+Sydney Load balancer -- will also works  ( you may need to wait for 2 min )
+
+
+-------------------------------
+When we buy the domain, we get hosted zones
+Both information we have in the dashboard.
+
+Select the hosted zone  (  sunilcloud.com ) , we get two records
+
+NS --  stands for name server.
+SOA -  stands for start of authority
+
+We need to create a new record set - Alias Record
+
+Create record set -- Name:  www   ( just type www in the text box  )
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select London Load balancer DNS NAme.
+
+Routing policy  - Simple   
+create.
+
+=========
+Now, test the domain  ( sunilcloud.com ) in browser
+It Works!!!
+
+We have achieved 1st advantage.
+Instead of providing difficult Load Balancer DNS name to public, we have provided user friendly domain name.
+
++++++++++++++++++
+
+Weighted - routing policy
+
+Lets delete the record set.
+
+Create record set --- Name: www 
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select London Load balancer DNS NAme
+
+Routing policy  - Weighted
+Weight : 70
+Set ID :  London LB  ( It is just description )
+
+Create.
+
+Create another record set
+---------------------------------------
+
+Create record set --- Name: www 
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select Sydney Load balancer DNS NAme
+
+Routing policy  - Weighted
+Weight : 30
+Set ID :  Sydney LB  ( It is just description )
+
+Create.
+
+Test!!!!
+Try to access domain from different IP  address ( machine )  to get the ration.
+
+++++++++++++++++++++
+Latency - routing policy
+
+Lets delete the two record sets , which we have created.
+
+Create record set --- Name: www 
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select London Load balancer DNS NAme
+
+Routing policy  - Latency
+Region -  eu-west-2    ( Official Region of London. We get it from DNS name also )
+
+RecordID :  London LB  ( It is just description )
+
+Create.
+
+
+Create another record set
+---------------------------------------
+
+Create record set --- Name: www 
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select Sydney Load balancer DNS NAme
+
+Routing policy  - Latency
+Region -  ap-southeast-2    ( Official Region of sydney. We get it from DNS name also )
+Set ID :  Sydney LB  ( It is just description )
+
+Create.
+
+Test!!!!
+We get london page, As london is near to us
+If a user from Aus try to access domain, we get Sydney page.
+
+++++++++++++++++++++++++++++++++++++++++++++++
+Failover policy
+
+Lets delete the two record sets.
+
+Lets make london and primary region
+Sydney as secondary region.
+
+We need to create health checks for this policy.
+Dashboard --- health checks --  create health check -- Name: London-HC
+
+specify endpoint - Domain name
+
+Domain name - provide DNS name of london load balancer
+path - index.html  ( Route 53 will check the entry of the file index.html in LB)
+
+Advanced configuration
+Request Interval - Fast ( 10 Sec )      ( waiting for to get ping response )
+Failure threshold - 1
+
+Next ---  Create health check.
+
+---------
+Go to hosted zones -- select the domain -- create record set
+
+Create record set --- Name: www 
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select London Load balancer DNS NAme
+
+Routing policy  - Failover
+Failover record type - primary
+Evaluate target Health - yes
+Associate health check - yes
+Health check to Associate  - London-HC
+
+Create.
+
+--------
+Create another record set
+---------------------------------------
+
+Create record set --- Name: www 
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select Sydney Load balancer DNS NAme
+
+Routing policy  - Failover
+Failover record type - Secondary
+Evaluate target Health - no
+Associate health check - no
+
+Create.
+
+test!!!
+We get london page,  as it is primary.
+Lets simulate failure scenario
+
+Lets stop both the Ec2 machines in london region.
+Now , access the domain, we should get sydney page.
+Lets  start the Ec2 machines,  we should get london page.
+
++++++++++++++++++++++++++++++++++++
+
+Geolocation Policy
+--------------------------
+Look at the Typical requirement
+Traffic from london should to routed to london.
+Traffic from india should be routed to sydney.
+
+Lets delete the two record sets.
+Delete health check.
+
+Go to hosted zones -- select the domain -- create record set
+
+Create record set --- Name: www 
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select London Load balancer DNS NAme
+
+Routing policy  - Geolocation
+Location - United Kingdom   ( Location of the customers )
+Set ID - LondonLB
+Create.
+--------------
+Create another record set --- Name: www 
+
+Alias  - select  yes ( radio button )
+
+Alias Target -  Select Sydney Load balancer DNS NAme
+
+Routing policy  - Geolocation
+Location - india  ( Location of the customers )
+Set ID - SydneyLB
+Create.
+
+test!!!
+We get sydney page  ( As traffic from india )
+traffic from london , we get london page.
+
+Requirement
+---------------------
+
+
+Traffic from india should be routed to sydney.
+Except india, traffic from other countries should be routed to london.
+
+For this, in the first record set
+Location - default.
+
+++++++++++++++
+Deletion process
+--------------------
+Delete two record sets.
+Delete health check if any.
+Terminate EC2 machines of both the regions.
+Delete Load balancers in both the regions.
+
+

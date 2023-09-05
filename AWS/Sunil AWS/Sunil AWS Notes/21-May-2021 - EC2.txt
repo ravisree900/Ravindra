@@ -1,0 +1,159 @@
+Launch Linux machine
+-------------------------------
+Create new EC2  Machine --  
+If any key pairs - delete
+If any security groups - delete  ( except default )
+
+Observation:
+Storage ( 30 gb for windows , 8 gb for linux )
+Security Group (  RDP for windows, SSH for Linux )
+
+AMI -  Amazon Linux 2 --->  T2.micro --> No of instance 2 -- tag - MyLinux ---> Change security group Security group name - LinSG , Description - LinSG ( optional ) - Review launch -- Create new keypair -- download key pair --  View Instances
+
+
+Observation - Two machines created.
+Lets change the names to   MyLinux-1, MyLinux-2
+
+Credentials required for windows machines are (  dns,  username and password )
+
+
+We use putty tool , to connect to linux machine.
+And, putty required  ppk file ( Putty private key )
+So, we need to convert .pem file to .ppk file.
+
+We use puttygen  to get the ppk file.
+
+Download from google using the  keywords "putty and puttygen"
+
+Under alternate binary files
+select putty.exe ( 64 bit )
+select puttygen.exe  ( 64 bit )
+
+
+Open puttygen  --  load  -- Save private key -- Save key without passphrase  ( Yes )  -- Save 
+
+Credentials required for putty -- 
+Hostname  -  username@dns       ( We get this from ssh command )
+
+select SSH -- Auth 	-  selecy ppk file using browse option --> Open
+
+username is - ec2-user   ( We get this from ssh command )
+
+---
+Now lets connect to 2nd linux machine 
+
+We do not need to conver the pem to ppk, as both the machines have same pem file.
+
+Right click on title bar of putty -- new session -- provide details -- change colors ( for easy identification )
+
+
+Note: Both machines have different DNS names.
+Terminate both the machines
+
+++++++++++++++++++++++
+
++++++++++++++++++++++++
+
+What is Webserver
+----------------------
+A Web server is a program that uses HTTP (Hypertext Transfer Protocol) to serve the files that from Web pages to users, in response to their request.
+
+Ex:
+1) Apache HTTP Server
+2) Internet Information Services (IIS)
+3) nginx
+4) httpd by Apache
+
+
+
+
+
+
+What is httpd
+---------------------
+HTTP Daemon is a software program that runs in the background as a web server.
+It waits for the incoming server requests. The daemon answers the request  and serves the hypertext and multimedia documents over the Internet using HTTP.
+
+
+
+
+
+Creating Web Server
+-------------------
+
+We need to install web package, it is called web server.
+package is nothing but software.
+
+Step 1: Launch Linux machine - Amazon Linux 2  ( Delete any keypair,  and security groups except default )   Name - MyLinux, Security Group Name - LinuxSG ,   View Instances.
+
+TO Connect to the machine
+Open puttygen  ---  generate ppk file.
+Open putty and connect to the machine.
+
+
+
+
+
+What is Yum repository
+--------------------------------
+YUM Repositories are warehouses of Linux software.
+Sometimes the software we want to install  is not available in Linux OS default.
+In such situations , we can use  YUM Repositories. 
+We can install new software on  Linux with 
+"yum install packagename" command from console.
+
+
+
+
+Installing Web Package
+-------------------------
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "MyGoogle" > index.html
+service httpd start
+chkconfig httpd on   (  This command will help to start httpd service        automatically, whenever machine is                                         restarted )
+
+
+Now, Our Linux machine is webserver.
+
+Now, Lets test are we able to access the web pages?
+
+Copy the public IP and paste in browser
+We are unable to access?
+
+Browser communicates using http port
+We should also open http port
+
+Lets open http port
+-----------------------
+
+IN AWS Dashboard, click on security groups
+Select our security group ( LinuxSG )  ---> Inbound --> Edit --> Add rule
+Select Type - HTTP -- Save.
+
+Observation: We get two entries for HTTP port.
+One for ipv4 and other for ipv6
+
+---------------
+Now, Lets test are we able to access the web pages?
+Yes!!!
+
+
++++++++++++++++++++++
+
+
+Bootstrap scripts
+When you launch an instance in Amazon EC2, you have the option of passing user data to the instance that can be used to perform common automated configuration tasks.
+
+#!/bin/bash
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "MyGoogle-2" > index.html
+service httpd start
+chkconfig httpd on
+
+

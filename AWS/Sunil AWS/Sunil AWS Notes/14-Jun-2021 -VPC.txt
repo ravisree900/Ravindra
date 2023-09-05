@@ -1,0 +1,327 @@
+VPC ctnd....
+Select  Mumbai region
+
+Step 1: Create VPC   ( MyVPC )  - 10.0.0.0/16
+Step 2: Create two subnets
+
+subnet1 - 10.0.1.0/24  -- WebSN
+subnet1 - 10.0.2.0/24  --DbSN
+
+Step 3: Enable public IP to subnet1
+Step 4: Create Internet Gateway  attach to VPC  -- MyIGW
+Step 5: Create Route table  - InternetRT
+Step 6: Attach Route table to subnet1
+Step 7: Attach Route table to Internet Gateway
+Now, subnet1 is public.
+Step 8: Create NAT in public subnet
+	So that we can have internet to private subnet
+
+NAT Gateways --> Create NAT Gateway
+subnet: 10.0.1.0/24
+Create new EIP ---> Create a NAT Gateway -- Close
+NAT needs 2 min appox to get created.
+
+++++++++++++++
+We need another Route table.
+Instead of creating new Route table, lets use existing default route table which was created automatically when VPC was created.
+
+We will use this route table to connect to NAT Gateway
+Lets Edit the name - NatRT
+
+One end of NatRT, we will connect to private subnet.
+
+Select NatRT ---Subnet Associations -- Edit Subnet Associations -- select private subnet ( 10.0.2.0/24 ) -- save
+
+Another end of NatRT , we will connect to NAT
+
+Select NatRT -- Routes ---> Edit Routes-- Add Route 
+Target -- NAT Gateway ( Select the Nat Gateway )
+Destination - 0.0.0.0/0  ( Mandatory )
+
+Save Routes -- Close
+
++++++++++++++++++++++++++++++++++++++++++
+
+Now, Lets launch Ec2 machine in public subnet.
+Name: Webserver
+Security Group:   WebSg11
+Description: WebSg1
+
+SSH  port  -- should be open to myself
+HTTP port -- should be open to all.
+
+Type		Source	
+SSH		My IP
+HTTP		Anywhere
+
+Review and launch -- Create new keypar  --  WebServer11KP.pem  --> Launch instances -- View instances
+
++++++++++++++++++++++++++++++++++
+
+
+
+Creating   Bastion/ Jump server  in public subnet
+DBA wants to connect to db server, to perform some maintenance activity.
+How can he connect? For this we create  Bastion Server.
+
+
+For Bastion server 
+
+SSH  port  -- should be open to myself
+
+Bastion server is nothing but EC2 Machine
+
+Services -- EC2 -- Luanch -- Amazon Linux ---> select VPC , Select subnet
+
+Name: BastionServer
+Security Group: Bastion11SG
+Description: Bastion11SG
+
+Type		Source
+SSH		My IP
+
+Review and launch -- launch -- Create new keypair  ---BastionServer11.pem
+
+View Instances
+
+Now, Only I can connect to Bastion server through SSH
+ Only I can connect to Web server through SSH
+
+Anyone in the world can access webserver ( Check with IP Address )
+
++++++++++++++++++++++++++++++++
+Create one database server in private subnet.
+Name Tag: DbServer
+
+Security group: Db11Sg
+Description: Db11Sg
+	
+Type			Source			
+MYSQL/Aurora		Custom		10.0.1.0/24
+SSH 			Custom		10.0.1.110/32   ( Bastion server private IP )
+
+Review and launch --download keypair --  db11KP.pem  -- launch insances
+
++++++++++++++++++
+
+Network ACL ( NACL )
+----------------------------
+Security group will provide security at instance level
+NACL will provide security at subnet level.
+
+Creating  NACL
+------------------------
+Select Network ACL ---- We have two default NACL
+One for default VPC
+One for MyVPC
+( So, whenever we create new VPC, by default  NACL is created automatically )
+
+We will create a new NACL and attach to public subnet
+----------------------------------------------------------------
+Create Network ACL -- Name Tag: PublicNACL
+VPC: MyVPC
+Create
+Subnet Associations -- Edit subnet associations --select public subnet
+Edit
+
+------------
+Now, try to access the webser
+We cannot get the webpage !!! No
+
+
+We need to open ports at NACL
+Inbound rules ---- Edit inbound rules --Add rule
+
+Rule#	Type		Source
+100 	SSH		122.175.5.152/32  ( My laptop IP,we can get it from bastion security group ) 
+200	HTTP		0.0.0.0/0			( HTTP open to all )
+
+Save.
+
+
+
+
+
+Now, try to access the webser
+We cannot get the webpage !!!  No
+
+We need to know about statefull and stateless
+---------------------------------------
+Lets select  webSecurity group  -- Inbound tab  -- edit
+
+Did we add ports in outbound tab?
+
+In security group, when we open inbound port, by default outbound port is open to all.
+This status is called statefull.
+
+So, we have opened HTTP incoming, by default outbound port is open to all.
+Hence, we are able to access webserver.
+
+This status is called statefull.
+
+
+For NACL , The case is different.
+We need to open outbound port  to NACL explicitly.
+So, NACL is stateless
+
+
+
+
+
+
+Select NACL -- Outbound Rules --- Edit Outbound Rules --- Add Rule 
+
+Rule		Type		Destination	
+100		SSH		122.175.5.152/32  ( MY IP )
+200 		HTTP		0.0.0.0/0
+
+Save
+
+Now, can we able to access webserver
+No!!!
+
+
+Ephemeral ports
+-----------------------
+Total Range of ports :  0 to 65535
+Range  1024 - 65535  are the range of ephemeral ports
+
+search in google "ephemeral ports in AWS" , we can see the range
+
+Assume in public subnet, we have 100 webservers
+All are connected to load balancer.
+If hacker blocks any http port on 1 webserver
+Will it be a problem?
+No!! 
+As load balancer will send the request to other servers.
+
+If hacker blocks any http port on NACL level  ( sunbnet level )
+Entire website is down.
+
+To avoid this problem, AWS is providing range of ports  ( 1024 - 65535 )
+
+We need to open this range in NACL level,
+So when hacker blocks a particular port ( HTTP ),  AWS uses a random port from the range.
+AWS will replace  the  random as HTTP port.
+
+So that website will never godown.
+
+
+
+
+Note:  Ephemeral ports are mandatory at NACL level
+++++++++++++++++++
+Select --  PublicNACL --- Inbound  -- Edit inboud rules -- Add rule
+
+Rule	Type			port range
+300	Custom TCP Rule 		1024-65535
+
+Save.
+
+Now, can we able to access webserver?
+No!!
+
+NACL are stateless. We need to open ports  in outbound level also.
+
+Select --  PublicNACL --- Outbound  -- Edit outboud rules -- Add rule
+
+Rule	Type			port range
+300	Custom TCP Rule 		1024-65535
+
+Save.
+
+++++++++++++++++++
+Now, can we able to access webserver?
+Yes!!
+
+++++++++++++++++++++
+WHat is the use of NACL?
+
+Select our NACL -- inbound rules
+
+Rule	Type
+200	HTTP    we have opened to all.
+
+Add Rule	
+Rule#	Type		Allow/ Deny
+201	HTTP		Deny
+
+Save.
+
+
+Similarly
+
+Select our NACL -- outbound rules
+
+Rule	Type
+200	HTTP    we have opened to all.
+
+Add Rule	Type		Allow/ Deny
+201	HTTP		Deny
+
+Save.
+
+Now,  Are we able to access webserver?
+Yes!!!
+Conclusion, Lowest rule#  will have highest priority.
+
+
+Now, in inbound rules
+Rule# --  201  change to  199.
+Save.
+
+goto outboud rules
+Rule# --  201  change to  199.
+Save.
+
+Now, 	 Lowest rule#  is 199  which is deny.
+so, we cannot access the webserver.
+No!!
+
+Usecase:
+-------------
+Hacker is continuous accessing the webserver.
+We want to block his IP, but other customers should be able to access the webserver.
+
+How can we do it.
+Lets Assume, I am the hacker
+Now, in inbound rules , change the source
+
+Rule#			Source
+199			122.175.5.152/32    ( My laptop  IP  )
+
+Save.
+
+ ( Network team will give us incoming request IP address)
+
+Similarly in outboud rules also
+
+Rule#			Source
+199			106.217.195.229/32    ( My laptop  IP  )
+
+Save.
+
+Now, Are we able to access webserver  
+No! ( As it is blocked to my machine )
+
+But, others can able to access the webserver.
+
+Imp Usecase:  By using NACL, we can block  specific IP address
+
+Now,
+Lets delete Rule# 199  from inbound and outbound level.
+Save.
+
+Now, Are we able to access webserver  
+Yes!!!
+
+NACL is not recommended to use for private subnet.
+
+++++++++++++++++++++++++++++++
+Deletion process
+-------------------
+Step 1: Delete NAT
+Step 2: Delete all Ec2 Machines
+Step 3: Delete VPC
+Step 4: Release Elastic IP
+
